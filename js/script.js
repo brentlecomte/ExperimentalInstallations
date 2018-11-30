@@ -1,6 +1,7 @@
 {
   const osc = require("osc");
   let currentTags = [];
+  const $title = document.querySelector("h1");
 
   const udpPort = new osc.UDPPort({
     localAddress: "localhost",
@@ -14,28 +15,31 @@
   udpPort.on("message", Tag => {
     if (Tag.args[0] === "set") {
       console.log(Tag);
-
       //add figure logic
       checkTags(Tag.args[2]);
     } else {
-      //Prompt to add icon
-      // console.log("no tag detected");
+      //Prompt to add figure
     }
-    deleteTags(Tag.args[1]);
+    onScreen(Tag.args);
   });
 
   const checkTags = currentTag => {
     const checkTag = currentTag;
     if (!currentTags.includes(checkTag)) {
       currentTags.push(checkTag);
-      // console.log(currentTags);
-    } else {
-      // console.log("already on playfield");
+      return;
     }
+
+    setTimeout(deleteTags(checkTag), 250);
   };
 
+  const onScreen = currentTag => {};
+
   const deleteTags = tagToDelete => {
-    // console.log("delete");
+    let index = currentTags.indexOf(tagToDelete);
+    if (index > -1) {
+      currentTags.splice(index, 1);
+    }
   };
 
   init();

@@ -14,28 +14,28 @@
 
   udpPort.on("message", Tag => {
     if (Tag.args[0] === "set") {
-      console.log(Tag);
-      //add figure logic
       checkTags(Tag.args[2]);
     } else {
       //Prompt to add figure
     }
-    onScreen(Tag.args);
+    checkIfIdle(Tag);
   });
 
   const checkTags = currentTag => {
     const checkTag = currentTag;
     if (!currentTags.includes(checkTag)) {
       currentTags.push(checkTag);
-      return;
     }
-
-    setTimeout(deleteTags(checkTag), 250);
   };
 
-  const onScreen = currentTag => {};
+  const checkIfIdle = Tag => {
+    if (currentTags.includes(Tag)) {
+      setTimeout(deleteTags(Tag), 2500);
+    }
+  };
 
   const deleteTags = tagToDelete => {
+    //delete tags
     let index = currentTags.indexOf(tagToDelete);
     if (index > -1) {
       currentTags.splice(index, 1);

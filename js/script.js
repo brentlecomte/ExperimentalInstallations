@@ -1,7 +1,6 @@
 {
   const osc = require("osc");
   let currentTags = [];
-  const $title = document.querySelector("h1");
 
   const udpPort = new osc.UDPPort({
     localAddress: "localhost",
@@ -14,7 +13,7 @@
 
   udpPort.on("message", Tag => {
     if (Tag.args[0] === "set") {
-      checkTags(Tag.args[2]);
+      checkTags(Tag.args);
     } else {
       //Prompt to add figure
     }
@@ -22,7 +21,7 @@
   });
 
   const checkTags = currentTag => {
-    const checkTag = currentTag;
+    const checkTag = currentTag[2];
     if (!currentTags.includes(checkTag)) {
       currentTags.push(checkTag);
     }

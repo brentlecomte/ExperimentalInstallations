@@ -19,24 +19,10 @@
 
   let island, islandHeight, islandDepth, dist, sea;
 
-  const udpPort = new osc.UDPPort({
-    localAddress: "localhost",
-    localPort: 3333
-  });
-
   const init = () => {
     udpPort.open();
     threeInit();
   };
-
-  udpPort.on("message", Tag => {
-    if (Tag.args[0] === "set") {
-      checkTags(Tag.args);
-    } else {
-      //Prompt to add figure
-    }
-    checkIfIdle(Tag);
-  });
 
   //THREEJS
 
@@ -161,17 +147,58 @@
 
     loop();
   };
+
+  // OSC / GAME LOGIC
+
+  const udpPort = new osc.UDPPort({
+    localAddress: "localhost",
+    localPort: 3333
+  });
+
+  udpPort.on("message", Tag => {
+    if (Tag.args[0] === "set") {
+      checkTags(Tag.args);
+    } else {
+      nothingOnScreen();
+    }
+  });
+
   const checkTags = currentTag => {
     const checkTag = currentTag[2];
-    if (!currentTags.includes(checkTag)) {
-      currentTags.push(checkTag);
+
+    switch (checkTag) {
+      case 0:
+        fireOnField(currentTag);
+        break;
+      case 1:
+        waterOnField(currentTag);
+        break;
+      default:
+        nothingOnScreen();
+        break;
     }
   };
 
-  const checkIfIdle = Tag => {
-    if (currentTags.includes(Tag)) {
-      setTimeout(deleteTags(Tag), 2500);
-    }
+  const fireOnField = fireTag => {
+    console.log(fireTag);
+    const geometry = new THREE.SphereGeometry(5, 32, 32);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const sphere = new THREE.Mesh(geometry, material);
+
+    console.log(WIDTH);
+
+    // sphere.position.x = mapValue(fireTag[3], 0, 1, 0, WIDTH);
+    sphere.position.x = mapValue(fireTag[3], 0, 1, WIDTH / 2, -WIDTH / 2);
+    sphere.position.z = mapValue(fireTag[4], 0, 1, -HEIGHT / 2, HEIGHT / 2);
+
+    scene.add(sphere);
+  };
+
+  const mapValue = (value, istart, istop, ostart, ostop) =>
+    ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+
+  const nothingOnScreen = () => {
+    console.log("nothing");
   };
 
   const deleteTags = tagToDelete => {

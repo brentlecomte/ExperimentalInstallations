@@ -19,8 +19,38 @@
 
   let island, islandHeight, islandDepth, dist, sea;
 
+  let mousePos = { x: 0, y: 0 };
+
+  let islandObj = {
+    lt: {
+      value: 100,
+      dead: false
+    },
+    lb: {
+      value: 100,
+      dead: false
+    },
+    mt: {
+      value: 100,
+      dead: false
+    },
+    mb: {
+      value: 100,
+      dead: false
+    },
+    rt: {
+      value: 100,
+      dead: false
+    },
+    rb: {
+      value: 100,
+      dead: false
+    }
+  };
+
   const init = () => {
     udpPort.open();
+    gameInit();
     threeInit();
   };
 
@@ -32,21 +62,13 @@
 
     scene = new THREE.Scene();
 
-    //renderer maken
     renderer = new THREE.WebGLRenderer({
-      // Allow transparency to show the gradient background
-      // we defined in the CSS
       alpha: true,
 
-      // Activate the anti-aliasing; this is less performant,
-      // but, as our project is low-poly based, it should be fine :)
       antialias: true
     });
 
-    //set size of renderer
     renderer.setSize(WIDTH, HEIGHT);
-
-    //enable shadow rendering
 
     container = document.querySelector(`.canvas`);
     container.appendChild(renderer.domElement);
@@ -134,7 +156,7 @@
     requestAnimationFrame(loop);
 
     sea.moveWaves();
-
+    checkPosition();
     renderer.render(scene, camera);
   };
 
@@ -150,6 +172,10 @@
 
   // OSC / GAME LOGIC
 
+  const gameInit = () => {
+    document.addEventListener("mousemove", handleMouseMove, false);
+  };
+
   const udpPort = new osc.UDPPort({
     localAddress: "localhost",
     localPort: 3333
@@ -162,6 +188,49 @@
       nothingOnScreen();
     }
   });
+
+  const checkPosition = () => {
+    if (mousePos.x < WIDTH / 3 && mousePos.y < HEIGHT / 2) {
+      updatePartIsland(islandObj.lt);
+    }
+    if (mousePos.x < WIDTH / 3 && mousePos.y > HEIGHT / 2) {
+      console.log("links onder");
+      updatePartIsland(islandObj.lb);
+    }
+    if (mousePos.x > WIDTH - WIDTH / 3 && mousePos.y < HEIGHT / 2) {
+      console.log("rechts boven");
+      updatePartIsland(islandObj.rt);
+    }
+    if (mousePos.x > WIDTH - WIDTH / 3 && mousePos.y > HEIGHT / 2) {
+      console.log("rechts onder");
+      updatePartIsland(islandObj.rb);
+    }
+    if (
+      mousePos.x > WIDTH / 3 &&
+      mousePos.x < WIDTH - WIDTH / 3 &&
+      mousePos.y < HEIGHT / 2
+    ) {
+      console.log("midden boven");
+      updatePartIsland(islandObj.mt);
+    }
+    if (
+      mousePos.x > WIDTH / 3 &&
+      mousePos.x < WIDTH - WIDTH / 3 &&
+      mousePos.y > HEIGHT / 2
+    ) {
+      console.log("midden onder");
+      updatePartIsland(islandObj.mb);
+    }
+  };
+
+  const updatePartIsland = partToUpdate => {
+    partToUpdate.value += 0.2;
+    console.log(islandObj);
+  };
+
+  const handleMouseMove = e => {
+    mousePos = { x: e.clientX, y: e.clientY };
+  };
 
   const checkTags = currentTag => {
     const checkTag = currentTag[2];
@@ -180,7 +249,6 @@
   };
 
   const fireOnField = fireTag => {
-    console.log(fireTag);
     const geometry = new THREE.SphereGeometry(5, 32, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
     const sphere = new THREE.Mesh(geometry, material);
@@ -190,6 +258,20 @@
     // sphere.position.x = mapValue(fireTag[3], 0, 1, 0, WIDTH);
     sphere.position.x = mapValue(fireTag[3], 0, 1, WIDTH / 2, -WIDTH / 2);
     sphere.position.z = mapValue(fireTag[4], 0, 1, -HEIGHT / 2, HEIGHT / 2);
+
+    scene.add(sphere);
+  };
+
+  const waterOnField = waterTag => {
+    const geometry = new THREE.SphereGeometry(5, 32, 32);
+    const material = new THREE.MeshBasicMaterial({ color: 0xbada55 });
+    const sphere = new THREE.Mesh(geometry, material);
+
+    console.log(WIDTH);
+
+    // sphere.position.x = mapValue(fireTag[3], 0, 1, 0, WIDTH);
+    sphere.position.x = mapValue(waterTag[3], 0, 1, WIDTH / 2, -WIDTH / 2);
+    sphere.position.z = mapValue(waterTag[4], 0, 1, -HEIGHT / 2, HEIGHT / 2);
 
     scene.add(sphere);
   };

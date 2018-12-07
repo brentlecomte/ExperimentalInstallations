@@ -17,9 +17,9 @@
     WIDTH,
     HEIGHT;
 
-  let island, islandHeight, islandDepth, dist, sea;
+  let tagOnPlayField = [];
 
-  let mousePos = { x: 0, y: 0 };
+  let island, islandHeight, islandDepth, dist, sea, sphere;
 
   let islandObj = {
     lt: {
@@ -156,7 +156,25 @@
     requestAnimationFrame(loop);
 
     sea.moveWaves();
-    checkPosition();
+    // checkPosition();
+    if (tagOnPlayField[3]) {
+      console.log(sphere);
+
+      sphere.position.x = mapValue(
+        tagOnPlayField[3],
+        0,
+        1,
+        WIDTH / 2,
+        -WIDTH / 2
+      );
+      sphere.position.z = mapValue(
+        tagOnPlayField[4],
+        0,
+        1,
+        -HEIGHT / 2,
+        HEIGHT / 2
+      );
+    }
     renderer.render(scene, camera);
   };
 
@@ -173,7 +191,7 @@
   // OSC / GAME LOGIC
 
   const gameInit = () => {
-    document.addEventListener("mousemove", handleMouseMove, false);
+    // document.addEventListener("mousemove", handleMouseMove, false);
   };
 
   const udpPort = new osc.UDPPort({
@@ -185,7 +203,7 @@
     if (Tag.args[0] === "set") {
       checkTags(Tag.args);
     } else {
-      nothingOnScreen();
+      // nothingOnScreen();
     }
   });
 
@@ -194,15 +212,12 @@
       updatePartIsland(islandObj.lt);
     }
     if (mousePos.x < WIDTH / 3 && mousePos.y > HEIGHT / 2) {
-      console.log("links onder");
       updatePartIsland(islandObj.lb);
     }
     if (mousePos.x > WIDTH - WIDTH / 3 && mousePos.y < HEIGHT / 2) {
-      console.log("rechts boven");
       updatePartIsland(islandObj.rt);
     }
     if (mousePos.x > WIDTH - WIDTH / 3 && mousePos.y > HEIGHT / 2) {
-      console.log("rechts onder");
       updatePartIsland(islandObj.rb);
     }
     if (
@@ -210,7 +225,6 @@
       mousePos.x < WIDTH - WIDTH / 3 &&
       mousePos.y < HEIGHT / 2
     ) {
-      console.log("midden boven");
       updatePartIsland(islandObj.mt);
     }
     if (
@@ -218,46 +232,60 @@
       mousePos.x < WIDTH - WIDTH / 3 &&
       mousePos.y > HEIGHT / 2
     ) {
-      console.log("midden onder");
       updatePartIsland(islandObj.mb);
     }
   };
 
   const updatePartIsland = partToUpdate => {
     partToUpdate.value += 0.2;
-    console.log(islandObj);
-  };
-
-  const handleMouseMove = e => {
-    mousePos = { x: e.clientX, y: e.clientY };
   };
 
   const checkTags = currentTag => {
     const checkTag = currentTag[2];
+    console.log(currentTag);
 
-    switch (checkTag) {
-      case 0:
-        fireOnField(currentTag);
-        break;
-      case 1:
-        waterOnField(currentTag);
-        break;
-      default:
-        nothingOnScreen();
-        break;
+    // switch (checkTag) {
+    //   case 0:
+    //     fireOnField(currentTag);
+    //     break;
+    //   case 1:
+    //     waterOnField(currentTag);
+    //     break;
+    //   default:
+    //     nothingOnScreen();
+    //     break;
+    // }
+
+    if (!currentTags.includes(checkTag)) {
+      currentTags.push(checkTag);
+      tagOnPlayField = currentTag;
+
+      fireOnField();
+      console.log(currentTags);
+    } else {
+      tagOnPlayField = currentTag;
     }
   };
 
-  const fireOnField = fireTag => {
+  const fireOnField = () => {
     const geometry = new THREE.SphereGeometry(5, 32, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-    const sphere = new THREE.Mesh(geometry, material);
+    sphere = new THREE.Mesh(geometry, material);
 
-    console.log(WIDTH);
-
-    // sphere.position.x = mapValue(fireTag[3], 0, 1, 0, WIDTH);
-    sphere.position.x = mapValue(fireTag[3], 0, 1, WIDTH / 2, -WIDTH / 2);
-    sphere.position.z = mapValue(fireTag[4], 0, 1, -HEIGHT / 2, HEIGHT / 2);
+    sphere.position.x = mapValue(
+      tagOnPlayField[3],
+      0,
+      1,
+      WIDTH / 2,
+      -WIDTH / 2
+    );
+    sphere.position.z = mapValue(
+      tagOnPlayField[4],
+      0,
+      1,
+      -HEIGHT / 2,
+      HEIGHT / 2
+    );
 
     scene.add(sphere);
   };
@@ -265,7 +293,7 @@
   const waterOnField = waterTag => {
     const geometry = new THREE.SphereGeometry(5, 32, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0xbada55 });
-    const sphere = new THREE.Mesh(geometry, material);
+    sphere = new THREE.Mesh(geometry, material);
 
     console.log(WIDTH);
 

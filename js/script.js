@@ -21,6 +21,8 @@
 
   let island, islandHeight, islandDepth, dist, sea, sphere;
 
+  let checkTag = [];
+
   let islandObj = {
     lt: {
       value: 100,
@@ -50,7 +52,6 @@
 
   const init = () => {
     udpPort.open();
-    gameInit();
     threeInit();
   };
 
@@ -156,10 +157,8 @@
     requestAnimationFrame(loop);
 
     sea.moveWaves();
-    // checkPosition();
+    checkPosition();
     if (tagOnPlayField[3]) {
-      console.log(sphere);
-
       sphere.position.x = mapValue(
         tagOnPlayField[3],
         0,
@@ -190,10 +189,6 @@
 
   // OSC / GAME LOGIC
 
-  const gameInit = () => {
-    // document.addEventListener("mousemove", handleMouseMove, false);
-  };
-
   const udpPort = new osc.UDPPort({
     localAddress: "localhost",
     localPort: 3333
@@ -201,36 +196,53 @@
 
   udpPort.on("message", Tag => {
     if (Tag.args[0] === "set") {
+      addTags(Tag.args);
+    }
+    if (Tag.args[0] === "alive") {
       checkTags(Tag.args);
-    } else {
-      // nothingOnScreen();
     }
   });
 
   const checkPosition = () => {
-    if (mousePos.x < WIDTH / 3 && mousePos.y < HEIGHT / 2) {
+    if (
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
+      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
+    ) {
       updatePartIsland(islandObj.lt);
     }
-    if (mousePos.x < WIDTH / 3 && mousePos.y > HEIGHT / 2) {
+    if (
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
+      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
+    ) {
       updatePartIsland(islandObj.lb);
     }
-    if (mousePos.x > WIDTH - WIDTH / 3 && mousePos.y < HEIGHT / 2) {
+    if (
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
+        WIDTH - WIDTH / 3 &&
+      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
+    ) {
       updatePartIsland(islandObj.rt);
     }
-    if (mousePos.x > WIDTH - WIDTH / 3 && mousePos.y > HEIGHT / 2) {
+    if (
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
+        WIDTH - WIDTH / 3 &&
+      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
+    ) {
       updatePartIsland(islandObj.rb);
     }
     if (
-      mousePos.x > WIDTH / 3 &&
-      mousePos.x < WIDTH - WIDTH / 3 &&
-      mousePos.y < HEIGHT / 2
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
+        WIDTH - WIDTH / 3 &&
+      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
     ) {
       updatePartIsland(islandObj.mt);
     }
     if (
-      mousePos.x > WIDTH / 3 &&
-      mousePos.x < WIDTH - WIDTH / 3 &&
-      mousePos.y > HEIGHT / 2
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
+      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
+        WIDTH - WIDTH / 3 &&
+      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
     ) {
       updatePartIsland(islandObj.mb);
     }
@@ -240,30 +252,23 @@
     partToUpdate.value += 0.2;
   };
 
-  const checkTags = currentTag => {
-    const checkTag = currentTag[2];
+  const addTags = currentTag => {
     console.log(currentTag);
 
-    // switch (checkTag) {
-    //   case 0:
-    //     fireOnField(currentTag);
-    //     break;
-    //   case 1:
-    //     waterOnField(currentTag);
-    //     break;
-    //   default:
-    //     nothingOnScreen();
-    //     break;
-    // }
-
-    if (!currentTags.includes(checkTag)) {
-      currentTags.push(checkTag);
+    checkTag = currentTag;
+    if (!currentTags.includes(checkTag[2])) {
+      currentTags.push(checkTag[2]);
       tagOnPlayField = currentTag;
-
       fireOnField();
-      console.log(currentTags);
     } else {
       tagOnPlayField = currentTag;
+    }
+  };
+
+  const checkTags = aliveTags => {
+    if (!aliveTags.includes(checkTag[1])) {
+      deleteTags(checkTag[2]);
+      scene.remove(sphere);
     }
   };
 
@@ -295,8 +300,6 @@
     const material = new THREE.MeshBasicMaterial({ color: 0xbada55 });
     sphere = new THREE.Mesh(geometry, material);
 
-    console.log(WIDTH);
-
     // sphere.position.x = mapValue(fireTag[3], 0, 1, 0, WIDTH);
     sphere.position.x = mapValue(waterTag[3], 0, 1, WIDTH / 2, -WIDTH / 2);
     sphere.position.z = mapValue(waterTag[4], 0, 1, -HEIGHT / 2, HEIGHT / 2);
@@ -312,7 +315,6 @@
   };
 
   const deleteTags = tagToDelete => {
-    //delete tags
     let index = currentTags.indexOf(tagToDelete);
     if (index > -1) {
       currentTags.splice(index, 1);

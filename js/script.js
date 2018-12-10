@@ -4,6 +4,7 @@
   let currentTags = [];
 
   const Island = require("./classes/Island.js");
+  const IslandBiome = require("./classes/IslandBiome.js");
   const Sea = require("./classes/Sea.js");
 
   let container,
@@ -19,8 +20,16 @@
     HEIGHT;
 
   let tagOnPlayField = [];
+  const islandPieces = [
+    `topLeft`,
+    `botLeft`,
+    `topRight`,
+    `botRight`,
+    `topMid`,
+    `botMid`
+  ];
 
-  let island, islandHeight, islandDepth, dist, sea, sphere;
+  let island, islandHeight, islandBiome, islandDepth, dist, sea, sphere;
 
   let checkTag = [];
 
@@ -139,11 +148,16 @@
 
   const createIsland = () => {
     island = new Island();
-
     island.mesh.scale.set(2, 1, 2);
     console.log(island.mesh);
-
     scene.add(island.mesh);
+
+    islandPieces.forEach(piece => {
+      islandBiome = new IslandBiome(piece);
+      islandBiome.mesh.scale.set(2, 1, 2);
+      console.log(islandBiome.mesh);
+      scene.add(islandBiome.mesh);
+    });
   };
 
   const createSea = () => {
@@ -222,27 +236,35 @@
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.lt);
+      updatePartIsland(islandObj.lt, `top left`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.lb);
+      updatePartIsland(islandObj.lb, `bot left`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.rt);
+      updatePartIsland(islandObj.rt, `top right`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.rb);
+      updatePartIsland(islandObj.rb, `bot right`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
@@ -250,7 +272,9 @@
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.mt);
+      updatePartIsland(islandObj.mt, `top mid`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
@@ -258,15 +282,20 @@
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.mb);
+      updatePartIsland(islandObj.mb, `bot mid`);
+    } else {
+      return;
     }
   };
 
-  const updatePartIsland = partToUpdate => {
+  const updatePartIsland = (partToUpdate, currentPos) => {
     partToUpdate.value += 0.2;
+    //console.log(currentPos);
   };
 
   const addTags = currentTag => {
+    //console.log(currentTag);
+
     checkTag = currentTag;
     if (!currentTags.includes(checkTag[2])) {
       currentTags.push(checkTag[2]);

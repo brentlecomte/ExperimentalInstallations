@@ -201,20 +201,6 @@
       );
     }
 
-    if (sphere) {
-      sphere.position.x = (sphere.position.x / window.innerWidth) * 2 - 1;
-      sphere.position.y = (sphere.position.y / window.innerHeight) * 2 - 1;
-      raycaster.setFromCamera(sphere.position, camera);
-
-      // calculate objects intersecting the picking ray
-      const intersects = raycaster.intersectObjects(scene.children);
-      console.log(intersects);
-
-      // for (var i = 0; i < intersects.length; i++) {
-      //   intersects[i].object.material.color.set(0xff0000);
-      // }
-    }
-
     renderer.render(scene, camera);
   };
 

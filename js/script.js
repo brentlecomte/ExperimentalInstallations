@@ -1,4 +1,5 @@
 {
+  let raycaster = new THREE.Raycaster();
   const osc = require("osc");
   let currentTags = [];
 
@@ -54,8 +55,6 @@
     udpPort.open();
     threeInit();
   };
-
-  //THREEJS
 
   const createScene = () => {
     WIDTH = window.innerWidth;
@@ -174,6 +173,21 @@
         HEIGHT / 2
       );
     }
+
+    if (sphere) {
+      sphere.position.x = (sphere.position.x / window.innerWidth) * 2 - 1;
+      sphere.position.y = (sphere.position.y / window.innerHeight) * 2 - 1;
+      raycaster.setFromCamera(sphere.position, camera);
+
+      // calculate objects intersecting the picking ray
+      const intersects = raycaster.intersectObjects(scene.children);
+      console.log(intersects);
+
+      // for (var i = 0; i < intersects.length; i++) {
+      //   intersects[i].object.material.color.set(0xff0000);
+      // }
+    }
+
     renderer.render(scene, camera);
   };
 
@@ -253,8 +267,6 @@
   };
 
   const addTags = currentTag => {
-    console.log(currentTag);
-
     checkTag = currentTag;
     if (!currentTags.includes(checkTag[2])) {
       currentTags.push(checkTag[2]);
@@ -269,6 +281,7 @@
     if (!aliveTags.includes(checkTag[1])) {
       deleteTags(checkTag[2]);
       scene.remove(sphere);
+      // sphere = null;
     }
   };
 

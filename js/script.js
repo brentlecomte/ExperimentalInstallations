@@ -204,31 +204,40 @@
   });
 
   const checkPosition = () => {
+    
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.lt);
+      updatePartIsland(islandObj.lt, `top left`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.lb);
+      updatePartIsland(islandObj.lb, `bot left`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.rt);
+      updatePartIsland(islandObj.rt, `top right`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.rb);
+      updatePartIsland(islandObj.rb, `bot right`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
@@ -236,7 +245,9 @@
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.mt);
+      updatePartIsland(islandObj.mt, `top mid`);
+    } else {
+      return;
     }
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
@@ -244,16 +255,20 @@
         WIDTH - WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
     ) {
-      updatePartIsland(islandObj.mb);
+      updatePartIsland(islandObj.mb, `bot mid`);
+    } else {
+      return;
     }
   };
 
-  const updatePartIsland = partToUpdate => {
+  const updatePartIsland = (partToUpdate, currentPos) => {
     partToUpdate.value += 0.2;
+    //console.log(currentPos);
+
   };
 
   const addTags = currentTag => {
-    console.log(currentTag);
+    //console.log(currentTag);
 
     checkTag = currentTag;
     if (!currentTags.includes(checkTag[2])) {

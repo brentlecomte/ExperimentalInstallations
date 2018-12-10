@@ -16,7 +16,7 @@ class Island {
 
         
           geometry.computeVertexNormals();
-          console.log(geometry);
+          //console.log(geometry);
           
           
 

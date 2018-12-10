@@ -18,6 +18,7 @@
     HEIGHT;
 
   let tagOnPlayField = [];
+  const islandPieces = [`topLeft`, `botLeft`, `topRight`, `botRight`, `topMid`, `botMid`]
 
   let island, islandHeight, islandDepth, dist, sea, sphere;
 
@@ -139,12 +140,14 @@
   };
 
   const createIsland = () => {
-    island = new Island();
+    islandPieces.forEach(piece => {
+      island = new Island(piece);
 
-    island.mesh.scale.set(2, 1, 2);
-    console.log(island.mesh);
-
-    scene.add(island.mesh);
+      island.mesh.scale.set(2, 1, 2);
+      console.log(island.mesh);
+  
+      scene.add(island.mesh);
+    })
   };
 
   const createSea = () => {

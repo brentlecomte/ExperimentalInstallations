@@ -2,7 +2,7 @@ const Colors = require('../objects/Colors.js');
 
 
 class Island {
-    constructor() {
+    constructor(piece) {
         this.mesh = new THREE.Object3D();
         const material = new THREE.MeshPhongMaterial({
           color: 0xeaaa3c,
@@ -12,7 +12,7 @@ class Island {
 
     
         const loader = new THREE.JSONLoader();
-        loader.load(`./assets/objects/island.json`, geometry => {
+        loader.load(`./assets/objects/${piece}.json`, geometry => {
 
         
           geometry.computeVertexNormals();

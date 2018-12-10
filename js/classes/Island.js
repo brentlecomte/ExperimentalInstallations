@@ -14,6 +14,7 @@ class Island {
       geometry.computeVertexNormals();
       console.log(geometry);
 
+
       const object = new THREE.Mesh(geometry, material);
 
       this.mesh.add(object);

@@ -29,6 +29,7 @@ class Sea {
     
         this.mesh = new THREE.Mesh(geom, mat);
         this.mesh.receiveShadows = true;
+        this.mesh.name = 'sea';
     
     
       }

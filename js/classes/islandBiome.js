@@ -10,7 +10,7 @@ class IslandBiome {
           color: 0x14a311,
           flatShading: true,
           transparent: true,
-          opacity: 0,
+          opacity: 1,
           name: piece
           
         });

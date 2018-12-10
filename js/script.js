@@ -377,12 +377,12 @@
 
   const onSphereMove = () => {
   
-    // mouseVector.x = (sphere.position.x / window.innerWidth) * 2 - 1;
-    // mouseVector.z = (sphere.position.z / window.innerHeight) * 2 + 1;
-    mouseVector.x = tagOnPlayField[3] * 2 - .5;
-    mouseVector.z = - tagOnPlayField[4] * 2 + .5;
-    console.log(tagOnPlayField[3])
-    //console.log(mouseVector.x, mouseVector.y, mouseVector.z);
+    mouseVector.x = - tagOnPlayField[3] * 4 + 2;
+    mouseVector.y = - tagOnPlayField[4] * 4 + 2;
+    
+    // console.log(mouseVector.x);
+    // console.log(mouseVector.y);
+    
   
     rayCaster.setFromCamera(mouseVector, camera);
     intersects = rayCaster.intersectObjects(islandBiomes.mesh.children, true);
@@ -390,7 +390,7 @@
     
     //console.log(islandBiomes.mesh.children);
   
-    console.log(intersects);
+    //console.log(intersects);
   
     if (intersects.length !== 0) {
       document.addEventListener(`click`, detailEvent);

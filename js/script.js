@@ -1,4 +1,5 @@
 {
+  let raycaster = new THREE.Raycaster();
   const osc = require("osc");
   let currentTags = [];
 
@@ -23,6 +24,15 @@
     lastPosY;
 
   let tagOnPlayField = [];
+
+  const islandPieces = [
+    `topLeft`,
+    `botLeft`,
+    `topRight`,
+    `botRight`,
+    `topMid`,
+    `botMid`
+  ];
 
   let island, islandHeight, islandBiomes, islandDepth, dist, sea, sphere;
 
@@ -59,8 +69,6 @@
     udpPort.open();
     threeInit();
   };
-
-  //THREEJS
 
   const createScene = () => {
     WIDTH = window.innerWidth;
@@ -145,7 +153,6 @@
   };
 
   const createIsland = () => {
-
     island = new Island();
     island.mesh.scale.set(2, 1, 2);
     console.log(island.mesh);
@@ -193,6 +200,21 @@
         HEIGHT / 2
       );
     }
+
+    if (sphere) {
+      sphere.position.x = (sphere.position.x / window.innerWidth) * 2 - 1;
+      sphere.position.y = (sphere.position.y / window.innerHeight) * 2 - 1;
+      raycaster.setFromCamera(sphere.position, camera);
+
+      // calculate objects intersecting the picking ray
+      const intersects = raycaster.intersectObjects(scene.children);
+      console.log(intersects);
+
+      // for (var i = 0; i < intersects.length; i++) {
+      //   intersects[i].object.material.color.set(0xff0000);
+      // }
+    }
+
     renderer.render(scene, camera);
   };
 
@@ -233,6 +255,7 @@
       lastPosY = sphere.position.z;
     }
     
+
     if (
       mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
       mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
@@ -292,7 +315,6 @@
   const updatePartIsland = (partToUpdate, currentPos) => {
     partToUpdate.value += 0.2;
     //console.log(currentPos);
-
   };
 
   const addTags = currentTag => {
@@ -312,6 +334,7 @@
     if (!aliveTags.includes(checkTag[1])) {
       deleteTags(checkTag[2]);
       scene.remove(sphere);
+      // sphere = null;
     }
   };
 

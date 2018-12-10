@@ -3,6 +3,7 @@
   let currentTags = [];
 
   const Island = require("./classes/Island.js");
+  const IslandBiome = require("./classes/IslandBiome.js");
   const Sea = require("./classes/Sea.js");
 
   let container,
@@ -20,7 +21,7 @@
   let tagOnPlayField = [];
   const islandPieces = [`topLeft`, `botLeft`, `topRight`, `botRight`, `topMid`, `botMid`]
 
-  let island, islandHeight, islandDepth, dist, sea, sphere;
+  let island, islandHeight, islandBiome, islandDepth, dist, sea, sphere;
 
   let checkTag = [];
 
@@ -140,13 +141,19 @@
   };
 
   const createIsland = () => {
-    islandPieces.forEach(piece => {
-      island = new Island(piece);
 
-      island.mesh.scale.set(2, 1, 2);
-      console.log(island.mesh);
+    island = new Island();
+    island.mesh.scale.set(2, 1, 2);
+    console.log(island.mesh);
+    scene.add(island.mesh);
+
+    islandPieces.forEach(piece => {
+      islandBiome = new IslandBiome(piece);
+      islandBiome.mesh.scale.set(2, 1, 2);
+      console.log(islandBiome.mesh);
+      scene.add(islandBiome.mesh);
+       
   
-      scene.add(island.mesh);
     })
   };
 

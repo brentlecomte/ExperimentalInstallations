@@ -3,14 +3,18 @@ const Colors = require('../objects/Colors.js');
 
 class IslandBiome {
     constructor(piece) {
+      
         this.mesh = new THREE.Object3D();
+        this.mesh.name = piece;
         const material = new THREE.MeshPhongMaterial({
           color: 0x14a311,
           flatShading: true,
           transparent: true,
-          opacity: 0
+          opacity: 1,
+          name: piece
           
         });
+
 
 
     
@@ -19,14 +23,9 @@ class IslandBiome {
 
         
           geometry.computeVertexNormals();
-          console.log(geometry);
-          
-          
-
+          //console.log(geometry);
           const object = new THREE.Mesh(geometry, material);
-          
-          
-    
+          object.name = `biome`;                    
           this.mesh.add(object);
         });
     }

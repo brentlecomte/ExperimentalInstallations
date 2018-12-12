@@ -1,6 +1,9 @@
 class Flower {
-  constructor() {
+  constructor(name, parent) {
     this.mesh = new THREE.Object3D();
+    this.mesh.name = name;
+    this.mesh.userData.parentName = parent;
+    
     
     const stuifmeelMaterial = new THREE.MeshPhongMaterial({
         color: 0xD7C76E,

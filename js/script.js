@@ -25,6 +25,8 @@
     lastPosY,
     flower;
 
+    let flowers = [];
+
   let topLeft,
     topMid,
     topRight,
@@ -186,13 +188,15 @@
     scene.add(sea.mesh);
   };
 
-  const createFlower = (x, z) => {
-    flower = new Flower();
-    flower.mesh.scale.set(.08, .08, .08);
+  const createFlower = (x, z, name, parent) => {
+    flower = new Flower(name, parent);
+    // flower.mesh.scale.set(.08, .08, .08);
+    flower.mesh.scale.set(0);
     flower.mesh.position.y = 40;
     flower.mesh.position.x = x;
     flower.mesh.position.z = z;
     scene.add(flower.mesh);
+    flowers.push(flower)
   }
 
   const loop = () => {
@@ -226,18 +230,20 @@
     createLights();
     createIsland();
     createSea();
-    createFlower(- 120, - 80, `topLeft1`);
-    createFlower(- 180, - 40, `topLeft2`);
-    createFlower(- 170, 40, `botLeft1`);
-    createFlower(- 110, 50, `botLeft2`);
-    createFlower(-20, 40, `botMid1`);
-    createFlower(40, 80, `botMid2`);
-    createFlower(-40, - 30, `topMid1`);
-    createFlower(30, - 65, `topMid2`);
-    createFlower(180, - 30, `topRight1`);
-    createFlower(130, - 65, `topRight2`);
-    createFlower(180, 30, `botRight1`);
-    createFlower(110, 50, `botRight2`);
+    createFlower(- 120, - 80, `topLeft1`, `topLeft`);
+    createFlower(- 180, - 40, `topLeft2`, `topLeft`);
+    createFlower(- 170, 40, `botLeft1`, `botLeft`);
+    createFlower(- 110, 50, `botLeft2`, `botLeft`);
+    createFlower(-20, 40, `botMid1`, `botMid`);
+    createFlower(40, 80, `botMid2`, `botMid`);
+    createFlower(-40, - 30, `topMid1`, `topMid`);
+    createFlower(30, - 65, `topMid2`, `toMid`);
+    createFlower(180, - 30, `topRight1`, `topRight`);
+    createFlower(130, - 65, `topRight2`, `topRight`);
+    createFlower(180, 30, `botRight1`, `botRight`);
+    createFlower(110, 50, `botRight2`, `botRight`);
+    //console.log(flowers);
+    
 
     loop();
   };
@@ -342,17 +348,17 @@
   };
 
   const checkTags = aliveTags => {
-    console.log(aliveTags);
-    console.log(pion);
+    // console.log(aliveTags);
+    // console.log(pion);
 
     if (!checkTag[0]) {
-      console.log("hallo");
+      //console.log("hallo");
 
       return;
     }
     if (!aliveTags.includes(checkTag[1])) {
       deleteTags(checkTag[2]);
-      console.log(checkTag);
+      //console.log(checkTag);
 
       scene.remove(pion.mesh);
       tagOnPlayField = [];
@@ -409,6 +415,7 @@
 
     rayCaster.setFromCamera(mouseVector, camera);
     intersects = rayCaster.intersectObjects(islandBiomes.mesh.children, true);
+    
 
     if (intersects.length !== 0) {
       detailEvent();
@@ -420,10 +427,17 @@
   const detailEvent = () => {
     for (let i = 0; i < intersects.length; i++) {
       if (intersects[i].object.name === `biome`) {
+        // console.log(intersects[i].object.parent.name);
+        updateBiome(intersects[i].object.parent.name, `rain`)
         break;
       }
     }
   };
+
+  const updateBiome = (biomeName, state) => {
+    console.log(biomeName, state);
+    
+  }
 
   init();
 }

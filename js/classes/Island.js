@@ -12,7 +12,6 @@ class Island {
     const loader = new THREE.JSONLoader();
     loader.load(`./assets/objects/island.json`, geometry => {
       geometry.computeVertexNormals();
-      console.log(geometry);
 
 
       const object = new THREE.Mesh(geometry, material);

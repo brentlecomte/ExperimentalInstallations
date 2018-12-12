@@ -1,10 +1,10 @@
 {
-  let raycaster = new THREE.Raycaster();
   const osc = require("osc");
   let currentTags = [];
 
   const Island = require("./classes/Island.js");
   const IslandBiomes = require("./classes/IslandBiomes.js");
+  const Flower = require("./classes/Flower.js");
   const Sea = require("./classes/Sea.js");
 
   let container,
@@ -21,7 +21,15 @@
     rayCaster,
     mouseVector,
     lastPosX,
-    lastPosY;
+    lastPosY,
+    flower;
+
+  let topLeft,
+    topMid,
+    topRight,
+    botLeft,
+    botMid,
+    botRight
 
   let tagOnPlayField = [];
 
@@ -155,22 +163,11 @@
   const createIsland = () => {
     island = new Island();
     island.mesh.scale.set(2, 1, 2);
-    console.log(island.mesh);
     scene.add(island.mesh);
 
     islandBiomes = new IslandBiomes();
     islandBiomes.mesh.scale.set(2, 1, 2);
-    console.log(islandBiomes.mesh);
     scene.add(islandBiomes.mesh);
-
-    // islandPieces.forEach(piece => {
-    //   islandBiome = new IslandBiome(piece);
-    //   islandBiome.mesh.scale.set(2, 1, 2);
-    //   console.log(islandBiome.mesh);
-    //   scene.add(islandBiome.mesh);
-       
-  
-    // })
   };
 
   const createSea = () => {
@@ -178,6 +175,15 @@
     sea.mesh.position.y = -74;
     scene.add(sea.mesh);
   };
+
+  const createFlower = (x, z) => {
+    flower = new Flower();
+    flower.mesh.scale.set(.08, .08, .08);
+    flower.mesh.position.y = 40;
+    flower.mesh.position.x = x;
+    flower.mesh.position.z = z;
+    scene.add(flower.mesh);
+  }
 
   const loop = () => {
     requestAnimationFrame(loop);
@@ -210,6 +216,18 @@
     createLights();
     createIsland();
     createSea();
+    createFlower(- 120, - 80, `topLeft1`);
+    createFlower(- 180, - 40, `topLeft2`);
+    createFlower(- 170, 40, `botLeft1`);
+    createFlower(- 110, 50, `botLeft2`);
+    createFlower(-20, 40, `botMid1`);
+    createFlower(40, 80, `botMid2`);
+    createFlower(-40, - 30, `topMid1`);
+    createFlower(30, - 65, `topMid2`);
+    createFlower(180, - 30, `topRight1`);
+    createFlower(130, - 65, `topRight2`);
+    createFlower(180, 30, `botRight1`);
+    createFlower(110, 50, `botRight2`);
 
     loop();
   };
@@ -242,60 +260,60 @@
     }
     
 
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.lt, `top left`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.lb, `bot left`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.rt, `top right`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.rb, `bot right`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.mt, `top mid`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.mb, `bot mid`);
-    } else {
-      return;
-    }
+    // if (
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
+    // ) {
+    //   updatePartIsland(islandObj.lt, `top left`);
+    // } else {
+    //   return;
+    // }
+    // if (
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
+    // ) {
+    //   updatePartIsland(islandObj.lb, `bot left`);
+    // } else {
+    //   return;
+    // }
+    // if (
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
+    //     WIDTH - WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
+    // ) {
+    //   updatePartIsland(islandObj.rt, `top right`);
+    // } else {
+    //   return;
+    // }
+    // if (
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
+    //     WIDTH - WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
+    // ) {
+    //   updatePartIsland(islandObj.rb, `bot right`);
+    // } else {
+    //   return;
+    // }
+    // if (
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
+    //     WIDTH - WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
+    // ) {
+    //   updatePartIsland(islandObj.mt, `top mid`);
+    // } else {
+    //   return;
+    // }
+    // if (
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
+    //     WIDTH - WIDTH / 3 &&
+    //   mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
+    // ) {
+    //   updatePartIsland(islandObj.mb, `bot mid`);
+    // } else {
+    //   return;
+    // }
   };
 
   const updatePartIsland = (partToUpdate, currentPos) => {

@@ -18,8 +18,14 @@
     scene,
     WIDTH,
     HEIGHT,
-    rayCaster,
-    mouseVector,
+    rayCaster0,
+    rayCaster1,
+    rayCaster2,
+    rayCaster3,
+    mouseVector0,
+    mouseVector1,
+    mouseVector2,
+    mouseVector3,
     lastPosX,
     lastPosY,
     sunPion1,
@@ -28,7 +34,7 @@
     rainPion2,
     flower,
     lastBiome;
-
+  
   let checkTag = [];
   let idTags = [];
   let currentTags = [];
@@ -88,9 +94,15 @@
 
   const init = () => {
     udpPort.open();
+    rayCaster1 = new THREE.Raycaster();
+    rayCaster2 = new THREE.Raycaster();
+    rayCaster3 = new THREE.Raycaster();
+    rayCaster0 = new THREE.Raycaster();
+    mouseVector0 = new THREE.Vector3();
+    mouseVector1 = new THREE.Vector3();
+    mouseVector2 = new THREE.Vector3();
+    mouseVector3 = new THREE.Vector3();
     threeInit();
-    rayCaster = new THREE.Raycaster();
-    mouseVector = new THREE.Vector3();
   };
 
   const createScene = () => {
@@ -264,21 +276,21 @@
       addTags(Tag.args);
     }
     if (Tag.args[0] === "alive") {
-      checkTags(Tag.args);
+      checkTags(Tag.args);     
     }
   });
 
   const checkPosition = () => {
-    // if (sunPion1) {
-    //   if (
-    //     sunPion1.mesh.position.x != lastPosX ||
-    //     sunPion1.mesh.position.z != lastPosY
-    //   ) {
-    //     onSphereMove();
-    //   }
-    //   lastPosX = sunPion1.mesh.position.x;
-    //   lastPosY = sunPion1.mesh.position.z;
-    // }
+    if (sunPion1) {
+      if (
+        sunPion1.mesh.position.x != lastPosX ||
+        sunPion1.mesh.position.z != lastPosY
+      ) {
+        onSphereMove();
+      }
+      lastPosX = sunPion1.mesh.position.x;
+      lastPosY = sunPion1.mesh.position.z;
+    }
     if (rainPion1) {
       if (
         rainPion1.mesh.position.x != lastPosX ||
@@ -292,11 +304,46 @@
   };
 
   const addTags = currentTag => {
-    checkTag = currentTag;
 
+    //console.log(currentTag);
+    
+
+    // checkTag = currentTag;
+    // if (!idTags.includes(checkTag[2])) {
+    //   idTags.push(checkTag[2]);
+    //   currentTags.push(checkTag);
+    //   switch (checkTag[2]) {
+    //     case 0:
+    //       fireOnField(checkTag);
+    //       break;
+    //     case 1:
+    //       fireOnField(checkTag);
+    //       break;
+    //     case 2:
+    //       waterOnField(checkTag);
+    //       break;
+    //     case 3:
+    //       waterOnField(checkTag);
+    //       break;
+    //   }
+    // } else {
+    //   currentTags.forEach(Tag => {
+    //     if (Tag[2] === checkTag[2]) {
+    //       Tag[3] = checkTag[3];
+    //       Tag[4] = checkTag[4];
+    //     }
+    //   });
+    // }
+
+    checkTag = currentTag;
     if (!idTags.includes(checkTag[2])) {
       idTags.push(checkTag[2]);
       currentTags.push(checkTag);
+      //console.log(checkTag);
+      
+      // currentTags.forEach(t => {
+      //   console.log(t);
+      // });
       switch (checkTag[2]) {
         case 0:
           fireOnField(checkTag);
@@ -359,12 +406,15 @@
       scene.add(sunPion1.mesh);
     } else {
       sunPion2 = pion;
+      tagToShow.push(sunPion2);
       checkTag.push(sunPion2);
       scene.add(sunPion2.mesh);
     }
   };
 
   const waterOnField = tagToShow => {
+    //console.log(tagToShow);
+
     pion = new AnimationPion();
 
     pion.mesh.position.x = mapValue(tagToShow[3], 0, 1, WIDTH / 2, -WIDTH / 2);
@@ -378,10 +428,12 @@
 
     if (tagToShow[2] === 2) {
       rainPion1 = pion;
+      tagToShow.push(rainPion1);
       checkTag.push(rainPion1);
       scene.add(rainPion1.mesh);
     } else {
       rainPion2 = pion;
+      tagToShow.push(rainPion2);
       checkTag.push(rainPion2);
       scene.add(rainPion2.mesh);
     }
@@ -389,6 +441,8 @@
 
   const mapValue = (value, istart, istop, ostart, ostop) =>
     ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+
+
 
   const deleteTagsFromArray = (tagToDelete, arrayToDeleteFrom) => {
     for (let i = 0; i < arrayToDeleteFrom.length; i++) {
@@ -462,45 +516,117 @@
   };
 
   const onSphereMove = () => {
-    mouseVector.x = -checkTag[3] * 4 + 2;
-    mouseVector.y = -checkTag[4] * 4 + 2;
 
-    rayCaster.setFromCamera(mouseVector, camera);
-    intersects = rayCaster.intersectObjects(islandBiomes.mesh.children, true);
+    //console.log(currentTags);
+    
 
-    if (intersects.length !== 0) {
-      detailEvent();
-    } else {
-      return;
-    }
+    currentTags.forEach(t => {
+
+      //console.log(t[2]);
+      
+
+      switch (t[2]) {
+        case 0:
+        mouseVector0.x = -checkTag[3] * 4 + 2;
+        mouseVector0.y = -checkTag[4] * 4 + 2;
+        rayCaster0.setFromCamera(mouseVector0, camera);
+        intersects = rayCaster0.intersectObjects(islandBiomes.mesh.children, true);
+    
+        if (intersects.length !== 0) {
+          detailEvent(`sun`);
+        } else {
+          return;
+        }
+          break;
+
+        case 1:
+        mouseVector1.x = -checkTag[3] * 4 + 2;
+        mouseVector1.y = -checkTag[4] * 4 + 2;
+        rayCaster1.setFromCamera(mouseVector1, camera);
+        intersects = rayCaster1.intersectObjects(islandBiomes.mesh.children, true);
+    
+        if (intersects.length !== 0) {
+          detailEvent(`sun`);
+        } else {
+          return;
+        }
+          break;
+
+
+        case 2:
+        mouseVector2.x = -checkTag[3] * 4 + 2;
+        mouseVector2.y = -checkTag[4] * 4 + 2;
+        rayCaster2.setFromCamera(mouseVector2, camera);
+        intersects = rayCaster2.intersectObjects(islandBiomes.mesh.children, true);
+    
+        if (intersects.length !== 0) {
+          detailEvent(`rain`);
+        } else {
+          return;
+        }
+          break;
+
+        case 3:
+        mouseVector3.x = -checkTag[3] * 4 + 2;
+        mouseVector3y = -checkTag[4] * 4 + 2;
+        rayCaster3.setFromCamera(mouseVector3, camera);
+        intersects = rayCaster3.intersectObjects(islandBiomes.mesh.children, true);
+    
+        if (intersects.length !== 0) {
+          detailEvent(`rain`);
+        } else {
+          return;
+        }
+          break;
+      
+        default:
+          break;
+      }
+      
+    })
   };
 
-  const detailEvent = () => {
-    for (let i = 0; i < intersects.length; i++) {
-      if (intersects[i].object.name === `biome`) {
-        let currentBiome = intersects[i].object.parent.name;
+  const detailEvent = state => {
+   //console.log(state);
+    
 
-        if (currentBiome != lastBiome) {
-          for (let i = 0; i < rainItems.length; i++) {
-            if (rainItems[i] === lastBiome) {
-              rainItems.splice(i, 1);
+    switch (state) {
+      case `rain`:
+      console.log(`rainLogic`);
+      
+        for (let i = 0; i < intersects.length; i++) {
+          if (intersects[i].object.name === `biome`) {
+            let currentBiome = intersects[i].object.parent.name;
+    
+            if (currentBiome != lastBiome) {
+              for (let i = 0; i < rainItems.length; i++) {
+                if (rainItems[i] === lastBiome) {
+                  rainItems.splice(i, 1);
+                }
+              }
+    
+              if (!rainItems.includes(intersects[i].object.parent.name)) {
+                rainItems.push(intersects[i].object.parent.name);
+              }
             }
-          }
-
-          if (!rainItems.includes(intersects[i].object.parent.name)) {
-            rainItems.push(intersects[i].object.parent.name);
+    
+            // const item = islandPieces.find(o => o[intersects[i].object.parent.name]);
+            // console.log(item[intersects[i].object.parent.name]);
+    
+            //updateBiome(intersects[i].object, item[intersects[i].object.parent.name])
+    
+            lastBiome = currentBiome;
           }
         }
-
-        // const item = islandPieces.find(o => o[intersects[i].object.parent.name]);
-        // console.log(item[intersects[i].object.parent.name]);
-
-        //updateBiome(intersects[i].object, item[intersects[i].object.parent.name])
-
-        lastBiome = currentBiome;
+          break;
+      case `sun` :
+        console.log(`sunLogic`);
+      
         break;
-      }
+      default:
+        break;
     }
+
   };
 
   init();

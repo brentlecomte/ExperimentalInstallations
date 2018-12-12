@@ -22,7 +22,6 @@
     mouseVector,
     lastPosX,
     lastPosY,
-
     sunPion1,
     sunPion2,
     rainPion1,
@@ -34,17 +33,15 @@
   let idTags = [];
   let currentTags = [];
 
+  let flowers = [];
+  let rainBiomes = [];
 
-    let flowers = [];
-    let rainBiomes = [];
-
-  let 
-  //   topLeft,
-  //   topMid,
-  //   topRight,
-  //   botLeft,
-  //   botMid,
-  //   botRight,
+  let //   topLeft,
+    //   topMid,
+    //   topRight,
+    //   botLeft,
+    //   botMid,
+    //   botRight,
     pion;
 
   let tagOnPlayField = [];
@@ -52,43 +49,42 @@
   const prevRainItems = [];
   const rainItems = [];
 
-  const islandPieces = [{
-    topLeft: {
-      name: `topLeft`,
-      rain: 0,
-      sun: 0,
-    },
-    botLeft: {
-      name: `botLeft`,
-      rain: 0,
-      sun: 0,
-    },
-    topMid: {
-      name: `topMid`,
-      rain: 0,
-      sun: 0,
-    },
-    botMid: {
-      name: `botMid`,
-      rain: 0,
-      sun: 0,
-    },
-    topRight: {
-      name: `topRight`,
-      rain: 0,
-      sun: 0,
-    },
-    botRight: {
-      name: `botRight`,
-      rain: 0,
-      sun: 0,
-    },
-
-  }];
+  const islandPieces = [
+    {
+      topLeft: {
+        name: `topLeft`,
+        rain: 0,
+        sun: 0
+      },
+      botLeft: {
+        name: `botLeft`,
+        rain: 0,
+        sun: 0
+      },
+      topMid: {
+        name: `topMid`,
+        rain: 0,
+        sun: 0
+      },
+      botMid: {
+        name: `botMid`,
+        rain: 0,
+        sun: 0
+      },
+      topRight: {
+        name: `topRight`,
+        rain: 0,
+        sun: 0
+      },
+      botRight: {
+        name: `botRight`,
+        rain: 0,
+        sun: 0
+      }
+    }
+  ];
 
   let island, islandHeight, islandBiomes, islandDepth, dist, sea;
-
-  let checkTag = [];
 
   const init = () => {
     udpPort.open();
@@ -182,7 +178,6 @@
 
     islandBiomes = new IslandBiomes();
     islandBiomes.mesh.scale.set(2, 1, 2);
-    
 
     scene.add(islandBiomes.mesh);
   };
@@ -201,14 +196,13 @@
     flower.mesh.position.x = x;
     flower.mesh.position.z = z;
     scene.add(flower.mesh);
-    flowers.push(flower)
-  }
+    flowers.push(flower);
+  };
 
   const loop = () => {
     requestAnimationFrame(loop);
     sea.moveWaves();
     checkPosition();
-
     currentTags.forEach(Tag => {
       if (Tag[3]) {
         Tag[Tag.length - 1].mesh.position.x = mapValue(
@@ -241,20 +235,19 @@
     createLights();
     createIsland();
     createSea();
-    createFlower(- 120, - 80, `topLeft1`, `topLeft`);
-    createFlower(- 180, - 40, `topLeft2`, `topLeft`);
-    createFlower(- 170, 40, `botLeft1`, `botLeft`);
-    createFlower(- 110, 50, `botLeft2`, `botLeft`);
+    createFlower(-120, -80, `topLeft1`, `topLeft`);
+    createFlower(-180, -40, `topLeft2`, `topLeft`);
+    createFlower(-170, 40, `botLeft1`, `botLeft`);
+    createFlower(-110, 50, `botLeft2`, `botLeft`);
     createFlower(-20, 40, `botMid1`, `botMid`);
     createFlower(40, 80, `botMid2`, `botMid`);
-    createFlower(-40, - 30, `topMid1`, `topMid`);
-    createFlower(30, - 65, `topMid2`, `toMid`);
-    createFlower(180, - 30, `topRight1`, `topRight`);
-    createFlower(130, - 65, `topRight2`, `topRight`);
+    createFlower(-40, -30, `topMid1`, `topMid`);
+    createFlower(30, -65, `topMid2`, `toMid`);
+    createFlower(180, -30, `topRight1`, `topRight`);
+    createFlower(130, -65, `topRight2`, `topRight`);
     createFlower(180, 30, `botRight1`, `botRight`);
     createFlower(110, 50, `botRight2`, `botRight`);
     //console.log(flowers);
-    
 
     loop();
   };
@@ -276,20 +269,31 @@
   });
 
   const checkPosition = () => {
-    if (sunPion1) {
+    // if (sunPion1) {
+    //   if (
+    //     sunPion1.mesh.position.x != lastPosX ||
+    //     sunPion1.mesh.position.z != lastPosY
+    //   ) {
+    //     onSphereMove();
+    //   }
+    //   lastPosX = sunPion1.mesh.position.x;
+    //   lastPosY = sunPion1.mesh.position.z;
+    // }
+    if (rainPion1) {
       if (
-        sunPion1.mesh.position.x != lastPosX ||
-        sunPion1.mesh.position.z != lastPosY
+        rainPion1.mesh.position.x != lastPosX ||
+        rainPion1.mesh.position.z != lastPosY
       ) {
         onSphereMove();
       }
-      lastPosX = sunPion1.mesh.position.x;
-      lastPosY = sunPion1.mesh.position.z;
+      lastPosX = rainPion1.mesh.position.x;
+      lastPosY = rainPion1.mesh.position.z;
     }
   };
-  
+
   const addTags = currentTag => {
     checkTag = currentTag;
+
     if (!idTags.includes(checkTag[2])) {
       idTags.push(checkTag[2]);
       currentTags.push(checkTag);
@@ -324,16 +328,16 @@
     if (!aliveTags.includes(checkTag[1])) {
       currentTags.forEach(Tag => {
         if (Tag.includes(checkTag[1])) {
+          console.log(checkTag);
+
+          deleteTagsFromArray(checkTag, currentTags);
+
+          deleteId(checkTag[2], idTags);
           scene.remove(Tag[Tag.length - 1].mesh);
+
+          checkTag = [];
         }
       });
-
-      deleteTags(checkTag, currentTags);
-
-      deleteTags(checkTag[2], idTags);
-
-      checkTag[checkTag.length - 1] = undefined;
-      checkTag = [];
     }
   };
 
@@ -351,12 +355,10 @@
 
     if (tagToShow[2] === 0) {
       sunPion1 = pion;
-      tagToShow.push(sunPion1);
       checkTag.push(sunPion1);
       scene.add(sunPion1.mesh);
     } else {
       sunPion2 = pion;
-      tagToShow.push(sunPion2);
       checkTag.push(sunPion2);
       scene.add(sunPion2.mesh);
     }
@@ -374,14 +376,12 @@
       HEIGHT / 2
     );
 
-    if (tagToShow[2] === 0) {
+    if (tagToShow[2] === 2) {
       rainPion1 = pion;
-      tagToShow.push(rainPion1);
       checkTag.push(rainPion1);
       scene.add(rainPion1.mesh);
     } else {
       rainPion2 = pion;
-      tagToShow.push(rainPion2);
       checkTag.push(rainPion2);
       scene.add(rainPion2.mesh);
     }
@@ -390,15 +390,25 @@
   const mapValue = (value, istart, istop, ostart, ostop) =>
     ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 
-  const deleteTags = (tagToDelete, arrayToDeleteFrom) => {
-    let index = arrayToDeleteFrom.indexOf(tagToDelete);
-    console.log(index);
+  const deleteTagsFromArray = (tagToDelete, arrayToDeleteFrom) => {
+    for (let i = 0; i < arrayToDeleteFrom.length; i++) {
+      if (
+        arrayToDeleteFrom[i][0] == tagToDelete[0] &&
+        arrayToDeleteFrom[i][1] == tagToDelete[1] &&
+        arrayToDeleteFrom[i][2] == tagToDelete[2]
+      ) {
+        arrayToDeleteFrom.splice(i, 1);
+        checkTag[checkTag.length - 1] = undefined;
+      }
+    }
+  };
 
-    arrayToDeleteFrom.splice(index - 1, 1);
+  const deleteId = (idToDelete, arrayToDeleteFrom) => {
+    let index = arrayToDeleteFrom.indexOf(idToDelete);
+    arrayToDeleteFrom.splice(index, 1);
   };
 
   const checkRainStates = () => {
-    
     for (let i = 0; i < rainItems.length; i++) {
       const item = islandPieces.find(o => o[rainItems[i]]);
 
@@ -407,61 +417,49 @@
           makeItRain(item[rainItems[i]], c.children[0]);
           return;
         }
-        
-      });      
+      });
     }
   };
 
   const makeItRain = (rainObjItem, rainModel) => {
-
-    
     if (rainObjItem.rain >= 100) {
-      return
+      return;
     } else {
-      rainObjItem.rain += .4;
-    
+      rainObjItem.rain += 0.4;
 
-    rainModel.material.opacity = rainObjItem.rain / 100;    
-  
-    };
-  }
+      rainModel.material.opacity = rainObjItem.rain / 100;
+    }
+  };
 
   const dryAll = () => {
-
     for (let p in islandPieces[0]) {
       const piece = islandPieces[0][p];
-      
+
       if (piece.rain > 0) {
-        piece.rain -= .05;        
+        piece.rain -= 0.05;
       }
 
       islandBiomes.mesh.children.forEach(c => {
         if (c.children[0]) {
           if (c.name === piece.name) {
-                      
-          c.children[0].material.opacity = piece.rain / 100;
-          console.log(c.children[0].material.opacity );
-          
-        
-          return;   
-          }
-        }    
-      });
+            c.children[0].material.opacity = piece.rain / 100;
 
-      
+            return;
+          }
+        }
+      });
     }
 
     // islandBiomes.mesh.children.forEach(c => {
     //   if (c.children[0]) {
     //     // console.log(c.name);
-        
-    //     console.log(c.children[0].material.opacity);
-      
-    //     return;         
-    //   }    
-    // });
 
-  }
+    //     console.log(c.children[0].material.opacity);
+
+    //     return;
+    //   }
+    // });
+  };
 
   const onSphereMove = () => {
     mouseVector.x = -checkTag[3] * 4 + 2;
@@ -469,7 +467,6 @@
 
     rayCaster.setFromCamera(mouseVector, camera);
     intersects = rayCaster.intersectObjects(islandBiomes.mesh.children, true);
-  
 
     if (intersects.length !== 0) {
       detailEvent();
@@ -482,25 +479,22 @@
     for (let i = 0; i < intersects.length; i++) {
       if (intersects[i].object.name === `biome`) {
         let currentBiome = intersects[i].object.parent.name;
-        
-        if (currentBiome != lastBiome) {
 
+        if (currentBiome != lastBiome) {
           for (let i = 0; i < rainItems.length; i++) {
             if (rainItems[i] === lastBiome) {
               rainItems.splice(i, 1);
-            };
-            
+            }
           }
 
           if (!rainItems.includes(intersects[i].object.parent.name)) {
-            rainItems.push(intersects[i].object.parent.name)
+            rainItems.push(intersects[i].object.parent.name);
           }
-  
-        };
+        }
 
         // const item = islandPieces.find(o => o[intersects[i].object.parent.name]);
         // console.log(item[intersects[i].object.parent.name]);
-        
+
         //updateBiome(intersects[i].object, item[intersects[i].object.parent.name])
 
         lastBiome = currentBiome;

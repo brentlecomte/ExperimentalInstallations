@@ -27,25 +27,51 @@
 
     let flowers = [];
 
-  let topLeft,
-    topMid,
-    topRight,
-    botLeft,
-    botMid,
-    botRight,
+  let 
+  //   topLeft,
+  //   topMid,
+  //   topRight,
+  //   botLeft,
+  //   botMid,
+  //   botRight,
     pion;
 
 
   let tagOnPlayField = [];
 
-  const islandPieces = [
-    `topLeft`,
-    `botLeft`,
-    `topRight`,
-    `botRight`,
-    `topMid`,
-    `botMid`
-  ];
+  const islandPieces = [{
+    topLeft: {
+      name: `topLeft`,
+      rain: 0,
+      sun: 0,
+    },
+    botLeft: {
+      name: `botLeft`,
+      rain: 0,
+      sun: 0,
+    },
+    topMid: {
+      name: `topMid`,
+      rain: 0,
+      sun: 0,
+    },
+    botMid: {
+      name: `botMid`,
+      rain: 0,
+      sun: 0,
+    },
+    topRight: {
+      name: `topRight`,
+      rain: 0,
+      sun: 0,
+    },
+    botRight: {
+      name: `botRight`,
+      rain: 0,
+      sun: 0,
+    },
+
+  }];
 
   let island, islandHeight, islandBiomes, islandDepth, dist, sea;
 
@@ -222,6 +248,7 @@
     }
 
     renderer.render(scene, camera);
+    dryAll();
   };
 
   const threeInit = () => {
@@ -409,6 +436,22 @@
     }
   };
 
+  const dryAll = () => {
+    islandPieces.forEach(a => {
+      
+        // for (let p in a) {
+          
+        //   if (a[p].rain <= 0) {
+        //     //console.log(`stop raining`);
+            
+        //   } else {
+        //     a[p].rain = a[p].rain - 0.1;
+        //   }
+        //   console.log(a[p].rain);      
+        // }
+    });
+  }
+
   const onSphereMove = () => {
     mouseVector.x = -tagOnPlayField[3] * 4 + 2;
     mouseVector.y = -tagOnPlayField[4] * 4 + 2;
@@ -428,14 +471,69 @@
     for (let i = 0; i < intersects.length; i++) {
       if (intersects[i].object.name === `biome`) {
         // console.log(intersects[i].object.parent.name);
-        updateBiome(intersects[i].object.parent.name, `rain`)
+        const item = islandPieces.find(o => o[intersects[i].object.parent.name]);
+        // console.log(item[intersects[i].object.parent.name]);
+        
+        updateBiome(intersects[i].object, item[intersects[i].object.parent.name], `rain`)
         break;
       }
     }
   };
 
-  const updateBiome = (biomeName, state) => {
-    console.log(biomeName, state);
+  const updateBiome = (biome, obj,  state) => {
+    console.log(biome, state);
+    // console.log(biome.material.opacity);
+    // biome.material.opacity = 1;
+
+      if (obj.rain >= 100) {
+        return
+      } else {
+        obj.rain += 0.4;
+      }
+
+      biome.material.opacity = obj.rain / 100;
+      
+      console.log(obj.rain);
+
+    
+    //console.log(obj.rain);
+    
+
+    // switch (biome.parent.name) {
+    //   case `topLeft`:
+    //     console.log(`editing topLeft`);
+        
+    //     break;
+    
+    //   case `botLeft`:
+    //     console.log(`editing botLeft`);
+        
+    //     break;
+    
+    //   case `topMid`:
+    //     console.log(`editing topMid`);
+        
+    //     break;
+    
+    //   case `botMid`:
+    //     console.log(`editing botMid`);
+        
+    //     break;
+    
+    //   case `topRight`:
+    //     console.log(`editing topRight`);
+        
+    //     break;
+    
+    //   case `botRight`:
+    //     console.log(`editing botRight`);
+        
+    //     break;
+    
+    //   default:
+    //     break;
+    // }
+    
     
   }
 

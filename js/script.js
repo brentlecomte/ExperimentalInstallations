@@ -1,6 +1,5 @@
 {
   const osc = require("osc");
-  let currentTags = [];
 
   const Island = require("./classes/Island.js");
   const IslandBiomes = require("./classes/IslandBiomes.js");
@@ -23,8 +22,18 @@
     mouseVector,
     lastPosX,
     lastPosY,
+
+    sunPion1,
+    sunPion2,
+    rainPion1,
+    rainPion2,
     flower,
     lastBiome;
+
+  let checkTag = [];
+  let idTags = [];
+  let currentTags = [];
+
 
     let flowers = [];
     let rainBiomes = [];
@@ -37,7 +46,6 @@
   //   botMid,
   //   botRight,
     pion;
-
 
   let tagOnPlayField = [];
 
@@ -200,23 +208,26 @@
     requestAnimationFrame(loop);
     sea.moveWaves();
     checkPosition();
-    if (tagOnPlayField[3]) {
-      pion.mesh.position.x = mapValue(
-        tagOnPlayField[3],
-        0,
-        1,
-        WIDTH / 2,
-        -WIDTH / 2
-      );
-      pion.mesh.position.z = mapValue(
-        tagOnPlayField[4],
-        0,
-        1,
-        -HEIGHT / 2,
-        HEIGHT / 2
-      );
-      pion.moveAnimation();
-    }
+
+    currentTags.forEach(Tag => {
+      if (Tag[3]) {
+        Tag[Tag.length - 1].mesh.position.x = mapValue(
+          Tag[3],
+          0,
+          1,
+          WIDTH / 2,
+          -WIDTH / 2
+        );
+        Tag[Tag.length - 1].mesh.position.z = mapValue(
+          Tag[4],
+          0,
+          1,
+          -HEIGHT / 2,
+          HEIGHT / 2
+        );
+        Tag[Tag.length - 1].moveAnimation();
+      }
+    });
 
     renderer.render(scene, camera);
 
@@ -265,89 +276,125 @@
   });
 
   const checkPosition = () => {
-    if (pion) {
+    if (sunPion1) {
       if (
-        pion.mesh.position.x != lastPosX ||
-        pion.mesh.position.z != lastPosY
+        sunPion1.mesh.position.x != lastPosX ||
+        sunPion1.mesh.position.z != lastPosY
       ) {
         onSphereMove();
       }
-      lastPosX = pion.mesh.position.x;
-      lastPosY = pion.mesh.position.z;
+      lastPosX = sunPion1.mesh.position.x;
+      lastPosY = sunPion1.mesh.position.z;
     }
   };
   
   const addTags = currentTag => {
     checkTag = currentTag;
-    if (!currentTags.includes(checkTag[2])) {
-      currentTags.push(checkTag[2]);
-      tagOnPlayField = currentTag;
-      fireOnField();
+    if (!idTags.includes(checkTag[2])) {
+      idTags.push(checkTag[2]);
+      currentTags.push(checkTag);
+      switch (checkTag[2]) {
+        case 0:
+          fireOnField(checkTag);
+          break;
+        case 1:
+          fireOnField(checkTag);
+          break;
+        case 2:
+          waterOnField(checkTag);
+          break;
+        case 3:
+          waterOnField(checkTag);
+          break;
+      }
     } else {
-      tagOnPlayField = currentTag;
+      currentTags.forEach(Tag => {
+        if (Tag[2] === checkTag[2]) {
+          Tag[3] = checkTag[3];
+          Tag[4] = checkTag[4];
+        }
+      });
     }
   };
 
   const checkTags = aliveTags => {
-    // console.log(aliveTags);
-    // console.log(pion);
-
     if (!checkTag[0]) {
-      //console.log("hallo");
-
       return;
     }
     if (!aliveTags.includes(checkTag[1])) {
-      deleteTags(checkTag[2]);
-      //console.log(checkTag);
+      currentTags.forEach(Tag => {
+        if (Tag.includes(checkTag[1])) {
+          scene.remove(Tag[Tag.length - 1].mesh);
+        }
+      });
 
-      scene.remove(pion.mesh);
-      tagOnPlayField = [];
-      pion = undefined;
+      deleteTags(checkTag, currentTags);
+
+      deleteTags(checkTag[2], idTags);
+
+      checkTag[checkTag.length - 1] = undefined;
       checkTag = [];
     }
   };
 
-  const fireOnField = () => {
+  const fireOnField = tagToShow => {
     pion = new AnimationPion();
 
-    pion.mesh.position.x = mapValue(
-      tagOnPlayField[3],
-      0,
-      1,
-      WIDTH / 2,
-      -WIDTH / 2
-    );
+    pion.mesh.position.x = mapValue(tagToShow[3], 0, 1, WIDTH / 2, -WIDTH / 2);
     pion.mesh.position.z = mapValue(
-      tagOnPlayField[4],
+      tagToShow[4],
       0,
       1,
       -HEIGHT / 2,
       HEIGHT / 2
     );
 
-    scene.add(pion.mesh);
+    if (tagToShow[2] === 0) {
+      sunPion1 = pion;
+      tagToShow.push(sunPion1);
+      checkTag.push(sunPion1);
+      scene.add(sunPion1.mesh);
+    } else {
+      sunPion2 = pion;
+      tagToShow.push(sunPion2);
+      checkTag.push(sunPion2);
+      scene.add(sunPion2.mesh);
+    }
   };
 
-  const waterOnField = waterTag => {
-    const geometry = new THREE.SphereGeometry(5, 32, 32);
-    const material = new THREE.MeshBasicMaterial({ color: 0xbada55 });
-    sphere = new THREE.Mesh(geometry, material);
+  const waterOnField = tagToShow => {
+    pion = new AnimationPion();
 
-    sphere.position.x = mapValue(waterTag[3], 0, 1, WIDTH / 2, -WIDTH / 2);
-    sphere.position.z = mapValue(waterTag[4], 0, 1, -HEIGHT / 2, HEIGHT / 2);
+    pion.mesh.position.x = mapValue(tagToShow[3], 0, 1, WIDTH / 2, -WIDTH / 2);
+    pion.mesh.position.z = mapValue(
+      tagToShow[4],
+      0,
+      1,
+      -HEIGHT / 2,
+      HEIGHT / 2
+    );
 
-    scene.add(sphere);
+    if (tagToShow[2] === 0) {
+      rainPion1 = pion;
+      tagToShow.push(rainPion1);
+      checkTag.push(rainPion1);
+      scene.add(rainPion1.mesh);
+    } else {
+      rainPion2 = pion;
+      tagToShow.push(rainPion2);
+      checkTag.push(rainPion2);
+      scene.add(rainPion2.mesh);
+    }
   };
 
   const mapValue = (value, istart, istop, ostart, ostop) =>
     ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 
-  const deleteTags = tagToDelete => {
-    let index = currentTags.indexOf(tagToDelete);
-    if (index > -1) {
-      currentTags.splice(index, 1);
-    }
+  const deleteTags = (tagToDelete, arrayToDeleteFrom) => {
+    let index = arrayToDeleteFrom.indexOf(tagToDelete);
+    console.log(index);
+
+    arrayToDeleteFrom.splice(index - 1, 1);
   };
 
   const checkRainStates = () => {
@@ -417,8 +464,8 @@
   }
 
   const onSphereMove = () => {
-    mouseVector.x = -tagOnPlayField[3] * 4 + 2;
-    mouseVector.y = -tagOnPlayField[4] * 4 + 2;
+    mouseVector.x = -checkTag[3] * 4 + 2;
+    mouseVector.y = -checkTag[4] * 4 + 2;
 
     rayCaster.setFromCamera(mouseVector, camera);
     intersects = rayCaster.intersectObjects(islandBiomes.mesh.children, true);

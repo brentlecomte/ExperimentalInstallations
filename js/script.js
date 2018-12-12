@@ -215,7 +215,6 @@
     requestAnimationFrame(loop);
     sea.moveWaves();
     checkPosition();
-
     currentTags.forEach(Tag => {
       if (Tag[3]) {
         Tag[Tag.length - 1].mesh.position.x = mapValue(
@@ -376,16 +375,16 @@
     if (!aliveTags.includes(checkTag[1])) {
       currentTags.forEach(Tag => {
         if (Tag.includes(checkTag[1])) {
+          console.log(checkTag);
+
+          deleteTagsFromArray(checkTag, currentTags);
+
+          deleteId(checkTag[2], idTags);
           scene.remove(Tag[Tag.length - 1].mesh);
+
+          checkTag = [];
         }
       });
-
-      deleteTags(checkTag, currentTags);
-
-      deleteTags(checkTag[2], idTags);
-
-      checkTag[checkTag.length - 1] = undefined;
-      checkTag = [];
     }
   };
 
@@ -443,11 +442,24 @@
   const mapValue = (value, istart, istop, ostart, ostop) =>
     ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 
-  const deleteTags = (tagToDelete, arrayToDeleteFrom) => {
-    let index = arrayToDeleteFrom.indexOf(tagToDelete);
-    //console.log(index);
 
-    arrayToDeleteFrom.splice(index - 1, 1);
+
+  const deleteTagsFromArray = (tagToDelete, arrayToDeleteFrom) => {
+    for (let i = 0; i < arrayToDeleteFrom.length; i++) {
+      if (
+        arrayToDeleteFrom[i][0] == tagToDelete[0] &&
+        arrayToDeleteFrom[i][1] == tagToDelete[1] &&
+        arrayToDeleteFrom[i][2] == tagToDelete[2]
+      ) {
+        arrayToDeleteFrom.splice(i, 1);
+        checkTag[checkTag.length - 1] = undefined;
+      }
+    }
+  };
+
+  const deleteId = (idToDelete, arrayToDeleteFrom) => {
+    let index = arrayToDeleteFrom.indexOf(idToDelete);
+    arrayToDeleteFrom.splice(index, 1);
   };
 
   const checkRainStates = () => {

@@ -294,13 +294,10 @@
 
   const addTags = currentTag => {
     checkTag = currentTag;
+
     if (!idTags.includes(checkTag[2])) {
       idTags.push(checkTag[2]);
       currentTags.push(checkTag);
-      console.log(currentTags);
-      currentTags.forEach(t => {
-        console.log(t);
-      });
       switch (checkTag[2]) {
         case 0:
           fireOnField(checkTag);
@@ -359,20 +356,16 @@
 
     if (tagToShow[2] === 0) {
       sunPion1 = pion;
-      tagToShow.push(sunPion1);
       checkTag.push(sunPion1);
       scene.add(sunPion1.mesh);
     } else {
       sunPion2 = pion;
-      tagToShow.push(sunPion2);
       checkTag.push(sunPion2);
       scene.add(sunPion2.mesh);
     }
   };
 
   const waterOnField = tagToShow => {
-    console.log(tagToShow);
-
     pion = new AnimationPion();
 
     pion.mesh.position.x = mapValue(tagToShow[3], 0, 1, WIDTH / 2, -WIDTH / 2);
@@ -386,14 +379,10 @@
 
     if (tagToShow[2] === 2) {
       rainPion1 = pion;
-      console.log(rainPion1);
-
-      tagToShow.push(rainPion1);
       checkTag.push(rainPion1);
       scene.add(rainPion1.mesh);
     } else {
       rainPion2 = pion;
-      tagToShow.push(rainPion2);
       checkTag.push(rainPion2);
       scene.add(rainPion2.mesh);
     }

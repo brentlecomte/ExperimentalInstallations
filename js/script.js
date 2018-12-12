@@ -6,6 +6,7 @@
   const IslandBiomes = require("./classes/IslandBiomes.js");
   const Flower = require("./classes/Flower.js");
   const Sea = require("./classes/Sea.js");
+  const AnimationPion = require("./classes/AnimationPion.js");
 
   let container,
     renderer,
@@ -29,7 +30,9 @@
     topRight,
     botLeft,
     botMid,
-    botRight
+    botRight,
+    pion;
+
 
   let tagOnPlayField = [];
 
@@ -42,7 +45,7 @@
     `botMid`
   ];
 
-  let island, islandHeight, islandBiomes, islandDepth, dist, sea, sphere;
+  let island, islandHeight, islandBiomes, islandDepth, dist, sea;
 
   let checkTag = [];
 
@@ -76,6 +79,8 @@
   const init = () => {
     udpPort.open();
     threeInit();
+    rayCaster = new THREE.Raycaster();
+    mouseVector = new THREE.Vector3();
   };
 
   const createScene = () => {
@@ -96,7 +101,6 @@
     container.appendChild(renderer.domElement);
 
     window.addEventListener("resize", handleWindowResize, false);
-    projectorStart();
   };
 
   const handleWindowResize = () => {
@@ -110,9 +114,6 @@
   setCamera = () => {
     islandHeight = 100;
     dist = 140;
-    let fov = 2 * Math.atan(islandHeight / (2 * dist)) * (180 / Math.PI);
-
-    console.log(fov);
 
     aspectRatio = WIDTH / HEIGHT;
     fieldOfView = 60;
@@ -127,7 +128,6 @@
     camera.position.y = camHeight;
     camera.position.z = 0;
     camera.rotation.x = (-90 * Math.PI) / 180;
-    // camera.lookAt(0,0,0)
   };
 
   const createLights = () => {
@@ -163,11 +163,21 @@
   const createIsland = () => {
     island = new Island();
     island.mesh.scale.set(2, 1, 2);
+
     scene.add(island.mesh);
 
     islandBiomes = new IslandBiomes();
     islandBiomes.mesh.scale.set(2, 1, 2);
+
     scene.add(islandBiomes.mesh);
+
+    // islandPieces.forEach(piece => {
+    //   islandBiome = new IslandBiome(piece);
+    //   islandBiome.mesh.scale.set(2, 1, 2);
+    //   console.log(islandBiome.mesh);
+    //   scene.add(islandBiome.mesh);
+
+    // })
   };
 
   const createSea = () => {
@@ -187,24 +197,24 @@
 
   const loop = () => {
     requestAnimationFrame(loop);
-
     sea.moveWaves();
     checkPosition();
     if (tagOnPlayField[3]) {
-      sphere.position.x = mapValue(
+      pion.mesh.position.x = mapValue(
         tagOnPlayField[3],
         0,
         1,
         WIDTH / 2,
         -WIDTH / 2
       );
-      sphere.position.z = mapValue(
+      pion.mesh.position.z = mapValue(
         tagOnPlayField[4],
         0,
         1,
         -HEIGHT / 2,
         HEIGHT / 2
       );
+      pion.moveAnimation();
     }
 
     renderer.render(scene, camera);
@@ -249,16 +259,16 @@
   });
 
   const checkPosition = () => {
-
-    if (sphere) {
-      
-      if (sphere.position.x != lastPosX || sphere.position.z != lastPosY) {
-        onSphereMove();        
+    if (pion) {
+      if (
+        pion.mesh.position.x != lastPosX ||
+        pion.mesh.position.z != lastPosY
+      ) {
+        onSphereMove();
       }
-      lastPosX = sphere.position.x;
-      lastPosY = sphere.position.z;
+      lastPosX = pion.mesh.position.x;
+      lastPosY = pion.mesh.position.z;
     }
-    
 
     // if (
     //   mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
@@ -318,12 +328,9 @@
 
   const updatePartIsland = (partToUpdate, currentPos) => {
     partToUpdate.value += 0.2;
-    //console.log(currentPos);
   };
 
   const addTags = currentTag => {
-    //console.log(currentTag);
-
     checkTag = currentTag;
     if (!currentTags.includes(checkTag[2])) {
       currentTags.push(checkTag[2]);
@@ -335,26 +342,36 @@
   };
 
   const checkTags = aliveTags => {
+    console.log(aliveTags);
+    console.log(pion);
+
+    if (!checkTag[0]) {
+      console.log("hallo");
+
+      return;
+    }
     if (!aliveTags.includes(checkTag[1])) {
       deleteTags(checkTag[2]);
-      scene.remove(sphere);
-      // sphere = null;
+      console.log(checkTag);
+
+      scene.remove(pion.mesh);
+      tagOnPlayField = [];
+      pion = undefined;
+      checkTag = [];
     }
   };
 
   const fireOnField = () => {
-    const geometry = new THREE.CylinderGeometry(5, 5, 32, 10);
-    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-    sphere = new THREE.Mesh(geometry, material);
+    pion = new AnimationPion();
 
-    sphere.position.x = mapValue(
+    pion.mesh.position.x = mapValue(
       tagOnPlayField[3],
       0,
       1,
       WIDTH / 2,
       -WIDTH / 2
     );
-    sphere.position.z = mapValue(
+    pion.mesh.position.z = mapValue(
       tagOnPlayField[4],
       0,
       1,
@@ -362,7 +379,7 @@
       HEIGHT / 2
     );
 
-    scene.add(sphere);
+    scene.add(pion.mesh);
   };
 
   const waterOnField = waterTag => {
@@ -370,7 +387,6 @@
     const material = new THREE.MeshBasicMaterial({ color: 0xbada55 });
     sphere = new THREE.Mesh(geometry, material);
 
-    // sphere.position.x = mapValue(fireTag[3], 0, 1, 0, WIDTH);
     sphere.position.x = mapValue(waterTag[3], 0, 1, WIDTH / 2, -WIDTH / 2);
     sphere.position.z = mapValue(waterTag[4], 0, 1, -HEIGHT / 2, HEIGHT / 2);
 
@@ -380,10 +396,6 @@
   const mapValue = (value, istart, istop, ostart, ostop) =>
     ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
 
-  const nothingOnScreen = () => {
-    console.log("nothing");
-  };
-
   const deleteTags = tagToDelete => {
     let index = currentTags.indexOf(tagToDelete);
     if (index > -1) {
@@ -391,55 +403,27 @@
     }
   };
 
-  const projectorStart = () => {
-    rayCaster = new THREE.Raycaster();
-    //console.log(rayCaster);
-  
-    mouseVector = new THREE.Vector3();
-    //console.log(mouseVector);
-  
-  
-    //container.addEventListener(`mousemove`, onMouseMove);
-  };
-
   const onSphereMove = () => {
-  
-    mouseVector.x = - tagOnPlayField[3] * 4 + 2;
-    mouseVector.y = - tagOnPlayField[4] * 4 + 2;
-    
-    // console.log(mouseVector.x);
-    // console.log(mouseVector.y);
-    
-  
+    mouseVector.x = -tagOnPlayField[3] * 4 + 2;
+    mouseVector.y = -tagOnPlayField[4] * 4 + 2;
+
     rayCaster.setFromCamera(mouseVector, camera);
     intersects = rayCaster.intersectObjects(islandBiomes.mesh.children, true);
-    //console.log(scene.children);
-    
-    //console.log(islandBiomes.mesh.children);
-  
-    //console.log(intersects);
-  
+
     if (intersects.length !== 0) {
-      document.addEventListener(`click`, detailEvent);
+      detailEvent();
     } else {
       return;
     }
   };
 
   const detailEvent = () => {
-    //console.log(`click`);
-  
-  
-    for (let i = 0;i < intersects.length;i ++) {
+    for (let i = 0; i < intersects.length; i++) {
       if (intersects[i].object.name === `biome`) {
-        console.log(`found`);
-        console.log(intersects[i].object.parent.name);
-  
         break;
       }
     }
   };
-  
 
   init();
 }

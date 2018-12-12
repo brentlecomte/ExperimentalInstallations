@@ -1,10 +1,10 @@
 {
-  let raycaster = new THREE.Raycaster();
   const osc = require("osc");
   let currentTags = [];
 
   const Island = require("./classes/Island.js");
   const IslandBiomes = require("./classes/IslandBiomes.js");
+  const Flower = require("./classes/Flower.js");
   const Sea = require("./classes/Sea.js");
   const AnimationPion = require("./classes/AnimationPion.js");
 
@@ -23,49 +23,64 @@
     mouseVector,
     lastPosX,
     lastPosY,
+    flower,
+    lastBiome;
+
+    let flowers = [];
+    let rainBiomes = [];
+
+  let 
+  //   topLeft,
+  //   topMid,
+  //   topRight,
+  //   botLeft,
+  //   botMid,
+  //   botRight,
     pion;
+
 
   let tagOnPlayField = [];
 
-  const islandPieces = [
-    `topLeft`,
-    `botLeft`,
-    `topRight`,
-    `botRight`,
-    `topMid`,
-    `botMid`
-  ];
+  const prevRainItems = [];
+  const rainItems = [];
+
+  const islandPieces = [{
+    topLeft: {
+      name: `topLeft`,
+      rain: 0,
+      sun: 0,
+    },
+    botLeft: {
+      name: `botLeft`,
+      rain: 0,
+      sun: 0,
+    },
+    topMid: {
+      name: `topMid`,
+      rain: 0,
+      sun: 0,
+    },
+    botMid: {
+      name: `botMid`,
+      rain: 0,
+      sun: 0,
+    },
+    topRight: {
+      name: `topRight`,
+      rain: 0,
+      sun: 0,
+    },
+    botRight: {
+      name: `botRight`,
+      rain: 0,
+      sun: 0,
+    },
+
+  }];
 
   let island, islandHeight, islandBiomes, islandDepth, dist, sea;
 
   let checkTag = [];
-
-  let islandObj = {
-    lt: {
-      value: 100,
-      dead: false
-    },
-    lb: {
-      value: 100,
-      dead: false
-    },
-    mt: {
-      value: 100,
-      dead: false
-    },
-    mb: {
-      value: 100,
-      dead: false
-    },
-    rt: {
-      value: 100,
-      dead: false
-    },
-    rb: {
-      value: 100,
-      dead: false
-    }
-  };
 
   const init = () => {
     udpPort.open();
@@ -159,16 +174,9 @@
 
     islandBiomes = new IslandBiomes();
     islandBiomes.mesh.scale.set(2, 1, 2);
+    
 
     scene.add(islandBiomes.mesh);
-
-    // islandPieces.forEach(piece => {
-    //   islandBiome = new IslandBiome(piece);
-    //   islandBiome.mesh.scale.set(2, 1, 2);
-    //   console.log(islandBiome.mesh);
-    //   scene.add(islandBiome.mesh);
-
-    // })
   };
 
   const createSea = () => {
@@ -176,6 +184,17 @@
     sea.mesh.position.y = -74;
     scene.add(sea.mesh);
   };
+
+  const createFlower = (x, z, name, parent) => {
+    flower = new Flower(name, parent);
+    // flower.mesh.scale.set(.08, .08, .08);
+    flower.mesh.scale.set(0);
+    flower.mesh.position.y = 40;
+    flower.mesh.position.x = x;
+    flower.mesh.position.z = z;
+    scene.add(flower.mesh);
+    flowers.push(flower)
+  }
 
   const loop = () => {
     requestAnimationFrame(loop);
@@ -200,6 +219,9 @@
     }
 
     renderer.render(scene, camera);
+
+    checkRainStates();
+    dryAll();
   };
 
   const threeInit = () => {
@@ -208,6 +230,20 @@
     createLights();
     createIsland();
     createSea();
+    createFlower(- 120, - 80, `topLeft1`, `topLeft`);
+    createFlower(- 180, - 40, `topLeft2`, `topLeft`);
+    createFlower(- 170, 40, `botLeft1`, `botLeft`);
+    createFlower(- 110, 50, `botLeft2`, `botLeft`);
+    createFlower(-20, 40, `botMid1`, `botMid`);
+    createFlower(40, 80, `botMid2`, `botMid`);
+    createFlower(-40, - 30, `topMid1`, `topMid`);
+    createFlower(30, - 65, `topMid2`, `toMid`);
+    createFlower(180, - 30, `topRight1`, `topRight`);
+    createFlower(130, - 65, `topRight2`, `topRight`);
+    createFlower(180, 30, `botRight1`, `botRight`);
+    createFlower(110, 50, `botRight2`, `botRight`);
+    //console.log(flowers);
+    
 
     loop();
   };
@@ -239,67 +275,8 @@
       lastPosX = pion.mesh.position.x;
       lastPosY = pion.mesh.position.z;
     }
-
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.lt, `top left`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) < WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.lb, `bot left`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.rt, `top right`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) >
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.rb, `bot right`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) < HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.mt, `top mid`);
-    } else {
-      return;
-    }
-    if (
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) > WIDTH / 3 &&
-      mapValue(tagOnPlayField[3], 0, 1, WIDTH / 2, -WIDTH / 2) <
-        WIDTH - WIDTH / 3 &&
-      mapValue(tagOnPlayField[4], 0, 1, WIDTH / 2, -WIDTH / 2) > HEIGHT / 2
-    ) {
-      updatePartIsland(islandObj.mb, `bot mid`);
-    } else {
-      return;
-    }
   };
-
-  const updatePartIsland = (partToUpdate, currentPos) => {
-    partToUpdate.value += 0.2;
-  };
-
+  
   const addTags = currentTag => {
     checkTag = currentTag;
     if (!currentTags.includes(checkTag[2])) {
@@ -312,17 +289,17 @@
   };
 
   const checkTags = aliveTags => {
-    console.log(aliveTags);
-    console.log(pion);
+    // console.log(aliveTags);
+    // console.log(pion);
 
     if (!checkTag[0]) {
-      console.log("hallo");
+      //console.log("hallo");
 
       return;
     }
     if (!aliveTags.includes(checkTag[1])) {
       deleteTags(checkTag[2]);
-      console.log(checkTag);
+      //console.log(checkTag);
 
       scene.remove(pion.mesh);
       tagOnPlayField = [];
@@ -373,12 +350,79 @@
     }
   };
 
+  const checkRainStates = () => {
+    
+    for (let i = 0; i < rainItems.length; i++) {
+      const item = islandPieces.find(o => o[rainItems[i]]);
+
+      islandBiomes.mesh.children.forEach(c => {
+        if (c.name === rainItems[i]) {
+          makeItRain(item[rainItems[i]], c.children[0]);
+          return;
+        }
+        
+      });      
+    }
+  };
+
+  const makeItRain = (rainObjItem, rainModel) => {
+
+    
+    if (rainObjItem.rain >= 100) {
+      return
+    } else {
+      rainObjItem.rain += .4;
+    
+
+    rainModel.material.opacity = rainObjItem.rain / 100;    
+  
+    };
+  }
+
+  const dryAll = () => {
+
+    for (let p in islandPieces[0]) {
+      const piece = islandPieces[0][p];
+      
+      if (piece.rain > 0) {
+        piece.rain -= .05;        
+      }
+
+      islandBiomes.mesh.children.forEach(c => {
+        if (c.children[0]) {
+          if (c.name === piece.name) {
+                      
+          c.children[0].material.opacity = piece.rain / 100;
+          console.log(c.children[0].material.opacity );
+          
+        
+          return;   
+          }
+        }    
+      });
+
+      
+    }
+
+    // islandBiomes.mesh.children.forEach(c => {
+    //   if (c.children[0]) {
+    //     // console.log(c.name);
+        
+    //     console.log(c.children[0].material.opacity);
+      
+    //     return;         
+    //   }    
+    // });
+
+  }
+
   const onSphereMove = () => {
     mouseVector.x = -tagOnPlayField[3] * 4 + 2;
     mouseVector.y = -tagOnPlayField[4] * 4 + 2;
 
     rayCaster.setFromCamera(mouseVector, camera);
     intersects = rayCaster.intersectObjects(islandBiomes.mesh.children, true);
+  
 
     if (intersects.length !== 0) {
       detailEvent();
@@ -390,6 +434,29 @@
   const detailEvent = () => {
     for (let i = 0; i < intersects.length; i++) {
       if (intersects[i].object.name === `biome`) {
+        let currentBiome = intersects[i].object.parent.name;
+        
+        if (currentBiome != lastBiome) {
+
+          for (let i = 0; i < rainItems.length; i++) {
+            if (rainItems[i] === lastBiome) {
+              rainItems.splice(i, 1);
+            };
+            
+          }
+
+          if (!rainItems.includes(intersects[i].object.parent.name)) {
+            rainItems.push(intersects[i].object.parent.name)
+          }
+  
+        };
+
+        // const item = islandPieces.find(o => o[intersects[i].object.parent.name]);
+        // console.log(item[intersects[i].object.parent.name]);
+        
+        //updateBiome(intersects[i].object, item[intersects[i].object.parent.name])
+
+        lastBiome = currentBiome;
         break;
       }
     }

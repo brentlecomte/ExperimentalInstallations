@@ -6,6 +6,7 @@
   const Flower = require("./classes/Flower.js");
   const Sea = require("./classes/Sea.js");
   const AnimationPion = require("./classes/AnimationPion.js");
+  const Boat = require("./classes/Boat.js");
 
   let container,
     renderer,
@@ -51,14 +52,22 @@
     lastBiome2,
     lastBiome3,
     lastBiomes = [],
-    //pion1,
-    //pion2;
+    pion1,
+    pion2;
     pion,
     calpoint1,
     calpoint2,
     sphere1,
-    sphere2;
+    sphere2,
+    boat;
+
   let calibrated = false;
+  let showDemoBool = false;
+
+  let $p = document.querySelector("p");
+  let $h1 = document.querySelector("h1");
+  let $p2 = document.querySelector(".p2");
+  let $h2 = document.querySelector("h2");
 
   let checkTag = [];
   let idTags = [];
@@ -128,6 +137,7 @@
     console.log(mouseVectors);
     
     threeInit();
+    calibration();
   };
 
   const createScene = () => {
@@ -258,10 +268,23 @@
     flowers.push(flower);
   };
 
+  const createBoat = () => {
+    boat = new Boat();
+
+    scene.add(boat.mesh);
+
+    boat.mesh.position.y = -20;
+  };
+
   const loop = () => {
     requestAnimationFrame(loop);
     sea.moveWaves();
     checkPosition();
+
+    if (calibrateTags.length === 1) {
+      $p.textContent = "Zet een andere pion op de rechterbol";
+      $p2.textContent = "Zet een andere pion op de rechterbol";
+    }
 
     if (!calpoint1 && calibrateTags.length === 2) {
       let i = 0;
@@ -274,9 +297,32 @@
         }
       });
 
-      calibrated = true;
+      $p.textContent = "Haal de pionnen van het eiland";
+      $p2.textContent = "Haal de pionnen van het eiland";
+
       scene.remove(sphere1);
       scene.remove(sphere2);
+      idTags = [];
+      setTimeout(() => {
+        $h1.textContent = "gekalibreerd";
+        $p.textContent = "het spel kan gespeelt worden";
+        $h2.textContent = "gekalibreerd";
+        $p2.textContent = "het spel kan gespeelt worden";
+        calibrated = true;
+      }, 3000);
+      setTimeout(() => {
+        $h1.textContent = "";
+        $p.textContent = "";
+        $h2.textContent = "";
+        $p2.textContent = "";
+        showDemoBool = true;
+      }, 5000);
+    }
+
+    if (showDemoBool === true) {
+      showDemoZon();
+      showDemoRegen();
+      showDemoBool = false;
     }
 
     currentTags.forEach(Tag => {
@@ -365,6 +411,25 @@
     loop();
   };
 
+  const showDemoZon = () => {
+    $h1.textContent = "Zonnedanser";
+    $p.textContent =
+      "Wanneer het genoeg geregend heeft kan de zonnedanser bloemen laten groeien!";
+    if (currentTags.length === 0) {
+      showDemoBool = true;
+    }
+  };
+
+  const showDemoRegen = () => {
+    $h2.textContent = "Regendanser";
+    $p2.textContent =
+      "Plaats de regendanser op het eiland en laat het groen worden!";
+
+    if (currentTags.length === 0) {
+      showDemoBool = true;
+    }
+  };
+
   const calibration = () => {
     const geometry1 = new THREE.SphereGeometry(5, 32, 32);
     const material1 = new THREE.MeshBasicMaterial({ color: 0xffff00 });
@@ -415,9 +480,8 @@
       }
       lastPosX = sunPion2.mesh.position.x;
       lastPosY = sunPion2.mesh.position.z;
-    };
+    }
     if (!rainPion1 == ``) {
-
       if (
         rainPion1.mesh.position.x != lastPosX ||
         rainPion1.mesh.position.z != lastPosY
@@ -521,6 +585,7 @@
     //console.log(tagToShow);
 
     pion2 = new AnimationPion();
+
 
     pion2.mesh.position.x = mapValue(tagToShow[3], 0, 1, WIDTH / 2, -WIDTH / 2);
     pion2.mesh.position.z = mapValue(
@@ -645,7 +710,6 @@
       
   //     // console.log(item[sunItems[i]]);
       
-
   //     islandBiomes.mesh.children.forEach(c => {
   //       if (c.name === sunItems[i]) {
   //         makeSunShine(item[sunItems[i]], c.children[0]);
@@ -688,7 +752,7 @@
         }
         
         flower.mesh.scale.set(targetScale.x, targetScale.x, targetScale.x) 
-        
+
       }
 
     }
@@ -699,24 +763,19 @@
       const piece = islandPieces[0][p];
 
       if (piece.sun > 0) {
-
         piece.sun -= 0.01;
-        
       }
 
       flowers.forEach(f => {
         if (f.mesh.userData.parentName === piece.name) {
-
           let targetScale = Math.max(0.001, piece.sun / 100);
-          f.mesh.scale.set(targetScale, targetScale, targetScale)
-          
+          f.mesh.scale.set(targetScale, targetScale, targetScale);
         }
       });
   }
 }
 
   const onSphereMove = n => {    
-
     currentTags.forEach(t => { 
       
       if (n = t[2]) {

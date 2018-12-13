@@ -134,7 +134,14 @@
     HEIGHT = window.innerHeight;
     WIDTH = window.innerWidth;
     renderer.setSize(WIDTH, HEIGHT);
-    camera.aspect = WIDTH / HEIGHT;
+    // camera.aspect = WIDTH / HEIGHT;
+
+    //new THREE.OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, near, far );
+    camera.left = WIDTH / -2;
+    camera.right = WIDTH / 2;
+    camera.top = HEIGHT / 2;
+    camera.bottom = HEIGHT / -2;
+    
     camera.updateProjectionMatrix();
   };
 
@@ -146,7 +153,8 @@
     fieldOfView = 60;
     near = 1;
     far = 10000;
-    camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, near, far);
+    // camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, near, far);
+    camera = new THREE.OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, near, far );
 
     camHeight = 320;
 
@@ -189,12 +197,12 @@
 
   const createIsland = () => {
     island = new Island();
-    island.mesh.scale.set(2, 1, 2);
+    island.mesh.scale.set(5, 1, 5);
 
     scene.add(island.mesh);
 
     islandBiomes = new IslandBiomes();
-    islandBiomes.mesh.scale.set(2, 1, 2);
+    islandBiomes.mesh.scale.set(5, 1, 5);
 
     scene.add(islandBiomes.mesh);
   };

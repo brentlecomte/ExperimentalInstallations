@@ -45,11 +45,17 @@
     lastBiome1,
     lastBiome2,
     lastBiome3,
-    pion;
+    pion,
+    calpoint1,
+    calpoint2,
+    sphere1,
+    sphere2;
+  let calibrated = false;
 
   let checkTag = [];
   let idTags = [];
   let currentTags = [];
+  let calibrateTags = [];
 
   let flowers = [];
   let rainBiomes = [];
@@ -142,7 +148,7 @@
     camera.right = WIDTH / 2;
     camera.top = HEIGHT / 2;
     camera.bottom = HEIGHT / -2;
-    
+
     camera.updateProjectionMatrix();
   };
 
@@ -155,7 +161,14 @@
     near = 1;
     far = 10000;
     // camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, near, far);
-    camera = new THREE.OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, near, far );
+    camera = new THREE.OrthographicCamera(
+      WIDTH / -2,
+      WIDTH / 2,
+      HEIGHT / 2,
+      HEIGHT / -2,
+      near,
+      far
+    );
 
     camHeight = 320;
 
@@ -198,13 +211,13 @@
 
   const createIsland = () => {
     island = new Island();
-    island.mesh.scale.set(5, 1, 5);
+    island.mesh.scale.set(3.8, 1, 3.8);
 
     scene.add(island.mesh);
 
     island.mesh.position.y = -20;
     islandBiomes = new IslandBiomes();
-    islandBiomes.mesh.scale.set(5, 1, 5);
+    islandBiomes.mesh.scale.set(3.8, 1, 3.8);
 
     scene.add(islandBiomes.mesh);
     islandBiomes.mesh.position.y = -20;
@@ -231,21 +244,41 @@
     requestAnimationFrame(loop);
     sea.moveWaves();
     checkPosition();
+
+    if (!calpoint1 && calibrateTags.length === 2) {
+      let i = 0;
+      calibrateTags.forEach(Tag => {
+        if (i === 0) {
+          calpoint1 = Tag[3];
+          i++;
+        } else {
+          calpoint2 = Tag[3];
+        }
+      });
+
+      calibrated = true;
+      scene.remove(sphere1);
+      scene.remove(sphere2);
+    }
+
     currentTags.forEach(Tag => {
-      if (Tag[3]) {
+      console.log(currentTags);
+
+      if (Tag[3] && calibrated === true && Tag.length === 12) {
         Tag[Tag.length - 1].mesh.position.x = mapValue(
           Tag[3],
-          0,
-          1,
-          WIDTH / 2,
-          -WIDTH / 2 + 67
+          calpoint1,
+          calpoint2,
+          360,
+          -360
         );
+
         Tag[Tag.length - 1].mesh.position.z = mapValue(
           Tag[4],
           0,
           1,
-          -HEIGHT / 2 + 340,
-          HEIGHT / 2 - 340
+          -HEIGHT / 2,
+          HEIGHT / 2
         );
         Tag[Tag.length - 1].moveAnimation();
       }
@@ -278,9 +311,25 @@
     createFlower(130, -65, `topRight2`, `topRight`);
     createFlower(180, 30, `botRight1`, `botRight`);
     createFlower(110, 50, `botRight2`, `botRight`);
+
+    calibration();
     //console.log(flowers);
 
     loop();
+  };
+
+  const calibration = () => {
+    const geometry1 = new THREE.SphereGeometry(5, 32, 32);
+    const material1 = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    sphere1 = new THREE.Mesh(geometry1, material1);
+    sphere1.position.set(360, 0, 0);
+
+    const geometry2 = new THREE.SphereGeometry(5, 32, 32);
+    const material2 = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    sphere2 = new THREE.Mesh(geometry2, material2);
+    sphere2.position.set(-360, 0, 0);
+    scene.add(sphere1);
+    scene.add(sphere2);
   };
 
   // OSC / GAME LOGIC
@@ -344,31 +393,37 @@
 
   const addTags = currentTag => {
     checkTag = currentTag;
-    if (!idTags.includes(checkTag[2])) {
-      idTags.push(checkTag[2]);
-      currentTags.push(checkTag);
 
-      switch (checkTag[2]) {
-        case 0:
-          fireOnField(checkTag);
-          break;
-        case 1:
-          fireOnField(checkTag);
-          break;
-        case 2:
-          waterOnField(checkTag);
-          break;
-        case 3:
-          waterOnField(checkTag);
-          break;
-      }
+    if (calibrated === false && !idTags.includes(checkTag[2])) {
+      idTags.push(checkTag[2]);
+      calibrateTags.push(checkTag);
     } else {
-      currentTags.forEach(Tag => {
-        if (Tag[2] === checkTag[2]) {
-          Tag[3] = checkTag[3];
-          Tag[4] = checkTag[4];
+      if (!idTags.includes(checkTag[2])) {
+        idTags.push(checkTag[2]);
+        currentTags.push(checkTag);
+
+        switch (checkTag[2]) {
+          case 0:
+            fireOnField(checkTag);
+            break;
+          case 1:
+            fireOnField(checkTag);
+            break;
+          case 2:
+            waterOnField(checkTag);
+            break;
+          case 3:
+            waterOnField(checkTag);
+            break;
         }
-      });
+      } else {
+        currentTags.forEach(Tag => {
+          if (Tag[2] === checkTag[2]) {
+            Tag[3] = checkTag[3];
+            Tag[4] = checkTag[4];
+          }
+        });
+      }
     }
   };
 
@@ -484,7 +539,7 @@
         break;
 
       case 2:
-        console.log(intersects2[0].object.parent.name);
+        // console.log(intersects2[0].object.parent.name);
         for (let i = 0; i < rainItems.length; i++) {
           if (rainItems[i] === intersects2[0].object.parent.name) {
             rainItems.splice(i, 1);
@@ -496,7 +551,7 @@
         break;
 
       case 3:
-        console.log(intersects3[0].object.parent.name);
+        // console.log(intersects3[0].object.parent.name);
         for (let i = 0; i < rainItems.length; i++) {
           if (rainItems[i] === intersects3[0].object.parent.name) {
             rainItems.splice(i, 1);

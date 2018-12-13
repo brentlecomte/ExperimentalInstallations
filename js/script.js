@@ -337,9 +337,6 @@
       idTags.push(checkTag[2]);
       currentTags.push(checkTag);
       
-      currentTags.forEach(t => {
-        console.log(t);
-      });
       switch (checkTag[2]) {
         case 0:
           fireOnField(checkTag);
@@ -456,21 +453,19 @@
   const deleteId = (idToDelete, arrayToDeleteFrom) => {
     let index = arrayToDeleteFrom.indexOf(idToDelete);
     arrayToDeleteFrom.splice(index, 1);
-    console.log(idToDelete);
     
     switch (idToDelete) {
       case 0:        
-      console.log(intersects0[0].object.parent.name);
       for (let i = 0; i < sunItems.length; i++) {
         if (sunItems[i] === intersects0[0].object.parent.name) {
           sunItems.splice(i, 1);
         }
       }
       
-      intersects0 = [];           break;
+      intersects0 = [];
+      break;
     
       case 1:
-      console.log(intersects1[0].object.parent.name);
       for (let i = 0; i < sunItems.length; i++) {
         if (sunItems[i] === intersects1[0].object.parent.name) {
           sunItems.splice(i, 1);
@@ -483,7 +478,6 @@
     
       case 2:
 
-        console.log(intersects2[0].object.parent.name);
         for (let i = 0; i < rainItems.length; i++) {
           if (rainItems[i] === intersects2[0].object.parent.name) {
             rainItems.splice(i, 1);
@@ -591,6 +585,7 @@
   const shrinkFlower = () => {
     for (let p in islandPieces[0]) {
       const piece = islandPieces[0][p];
+      
 
       if (piece.sun > 0) {
         piece.sun -= 0.05;
@@ -615,6 +610,7 @@
         mouseVector0.x = -checkTag[3] * 4 + 2;
         mouseVector0.y = -checkTag[4] * 4 + 2;
         rayCaster0.setFromCamera(mouseVector0, camera);
+        
         intersects0 = rayCaster0.intersectObjects(islandBiomes.mesh.children, true);
         if (intersects0.length !== 0) {
           detailEvent(`0`);
@@ -627,6 +623,8 @@
         mouseVector1.x = -checkTag[3] * 4 + 2;
         mouseVector1.y = -checkTag[4] * 4 + 2;
         rayCaster1.setFromCamera(mouseVector1, camera);
+        
+
         intersects1 = rayCaster1.intersectObjects(islandBiomes.mesh.children, true);
     
         if (intersects1.length !== 0) {
@@ -641,6 +639,7 @@
         mouseVector2.x = -checkTag[3] * 4 + 2;
         mouseVector2.y = -checkTag[4] * 4 + 2;
         rayCaster2.setFromCamera(mouseVector2, camera);
+
         intersects2 = rayCaster2.intersectObjects(islandBiomes.mesh.children, true);
     
         if (intersects2.length !== 0) {
@@ -668,9 +667,13 @@
       }
       
     })
+    
   };
 
   const detailEvent = state => {
+
+ 
+    
    
     switch (state) {
       case `0` :
@@ -700,6 +703,7 @@
 
       case `1` :
       for (let i = 0; i < intersects1.length; i++) {
+
         if (intersects1[i].object.name === `biome`) {
           let currentBiome1 = intersects1[i].object.parent.name;
 
@@ -713,8 +717,7 @@
           if (!sunItems.includes(intersects1[i].object.parent.name)) {
             sunItems.push(intersects1[i].object.parent.name);
           }
-        }
-
+        }        
         lastBiome1 = currentBiome1;
 
 
@@ -741,7 +744,7 @@
               if (!rainItems.includes(intersects2[i].object.parent.name)) {
                 rainItems.push(intersects2[i].object.parent.name);
               }
-            }    
+            }                
             lastBiome2 = currentBiome2;
           }
         }

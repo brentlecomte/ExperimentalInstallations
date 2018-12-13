@@ -26,6 +26,10 @@
     mouseVector1,
     mouseVector2,
     mouseVector3,
+    intersects1,
+    intersects2,
+    intersects3,
+    intersects0,
     lastPosX,
     lastPosY,
     sunPion1,
@@ -290,7 +294,17 @@
       }
       lastPosX = sunPion1.mesh.position.x;
       lastPosY = sunPion1.mesh.position.z;
-    }
+    };
+    if (sunPion2) {
+      if (
+        sunPion2.mesh.position.x != lastPosX ||
+        sunPion2.mesh.position.z != lastPosY
+      ) {
+        onSphereMove();
+      }
+      lastPosX = sunPion2.mesh.position.x;
+      lastPosY = sunPion2.mesh.position.z;
+    };
     if (rainPion1) {
       if (
         rainPion1.mesh.position.x != lastPosX ||
@@ -300,6 +314,16 @@
       }
       lastPosX = rainPion1.mesh.position.x;
       lastPosY = rainPion1.mesh.position.z;
+    }
+    if (rainPion2) {
+      if (
+        rainPion2.mesh.position.x != lastPosX ||
+        rainPion2.mesh.position.z != lastPosY
+      ) {
+        onSphereMove();
+      }
+      lastPosX = rainPion2.mesh.position.x;
+      lastPosY = rainPion2.mesh.position.z;
     }
   };
 
@@ -341,9 +365,9 @@
       currentTags.push(checkTag);
       //console.log(checkTag);
       
-      // currentTags.forEach(t => {
-      //   console.log(t);
-      // });
+      currentTags.forEach(t => {
+        console.log(t);
+      });
       switch (checkTag[2]) {
         case 0:
           fireOnField(checkTag);
@@ -372,10 +396,11 @@
     if (!checkTag[0]) {
       return;
     }
+
+    
     if (!aliveTags.includes(checkTag[1])) {
       currentTags.forEach(Tag => {
         if (Tag.includes(checkTag[1])) {
-          console.log(checkTag);
 
           deleteTagsFromArray(checkTag, currentTags);
 
@@ -398,7 +423,7 @@
       1,
       -HEIGHT / 2,
       HEIGHT / 2
-    );
+    );    
 
     if (tagToShow[2] === 0) {
       sunPion1 = pion;
@@ -406,7 +431,6 @@
       scene.add(sunPion1.mesh);
     } else {
       sunPion2 = pion;
-      tagToShow.push(sunPion2);
       checkTag.push(sunPion2);
       scene.add(sunPion2.mesh);
     }
@@ -460,6 +484,49 @@
   const deleteId = (idToDelete, arrayToDeleteFrom) => {
     let index = arrayToDeleteFrom.indexOf(idToDelete);
     arrayToDeleteFrom.splice(index, 1);
+    console.log(idToDelete);
+    
+    switch (idToDelete) {
+      case 0:        
+        intersects0 = [];        
+        break;
+    
+      case 1:
+        intersects1 = [];        
+        
+        break;
+    
+      case 2:
+
+        console.log(intersects2[0].object.parent.name);
+        for (let i = 0; i < rainItems.length; i++) {
+          if (rainItems[i] === intersects2[0].object.parent.name) {
+            rainItems.splice(i, 1);
+          }
+        }
+        
+        intersects2 = [];        
+        
+        break;
+    
+      case 3:
+
+        console.log(intersects3[0].object.parent.name);
+        for (let i = 0; i < rainItems.length; i++) {
+          if (rainItems[i] === intersects3[0].object.parent.name) {
+            rainItems.splice(i, 1);
+          }
+        }
+        
+        intersects3 = [];        
+        
+        break;
+    
+      default:
+        break;
+    }
+
+    
   };
 
   const checkRainStates = () => {
@@ -520,20 +587,16 @@
     //console.log(currentTags);
     
 
-    currentTags.forEach(t => {
-
-      //console.log(t[2]);
-      
+    currentTags.forEach(t => {      
 
       switch (t[2]) {
-        case 0:
+        case 0:        
         mouseVector0.x = -checkTag[3] * 4 + 2;
         mouseVector0.y = -checkTag[4] * 4 + 2;
         rayCaster0.setFromCamera(mouseVector0, camera);
-        intersects = rayCaster0.intersectObjects(islandBiomes.mesh.children, true);
-    
-        if (intersects.length !== 0) {
-          detailEvent(`sun`);
+        intersects0 = rayCaster0.intersectObjects(islandBiomes.mesh.children, true);
+        if (intersects0.length !== 0) {
+          detailEvent(`0`);
         } else {
           return;
         }
@@ -543,10 +606,10 @@
         mouseVector1.x = -checkTag[3] * 4 + 2;
         mouseVector1.y = -checkTag[4] * 4 + 2;
         rayCaster1.setFromCamera(mouseVector1, camera);
-        intersects = rayCaster1.intersectObjects(islandBiomes.mesh.children, true);
+        intersects1 = rayCaster1.intersectObjects(islandBiomes.mesh.children, true);
     
-        if (intersects.length !== 0) {
-          detailEvent(`sun`);
+        if (intersects1.length !== 0) {
+          detailEvent(`1`);
         } else {
           return;
         }
@@ -557,10 +620,10 @@
         mouseVector2.x = -checkTag[3] * 4 + 2;
         mouseVector2.y = -checkTag[4] * 4 + 2;
         rayCaster2.setFromCamera(mouseVector2, camera);
-        intersects = rayCaster2.intersectObjects(islandBiomes.mesh.children, true);
+        intersects2 = rayCaster2.intersectObjects(islandBiomes.mesh.children, true);
     
-        if (intersects.length !== 0) {
-          detailEvent(`rain`);
+        if (intersects2.length !== 0) {
+          detailEvent(`2`);
         } else {
           return;
         }
@@ -568,12 +631,12 @@
 
         case 3:
         mouseVector3.x = -checkTag[3] * 4 + 2;
-        mouseVector3y = -checkTag[4] * 4 + 2;
+        mouseVector3.y = -checkTag[4] * 4 + 2;
         rayCaster3.setFromCamera(mouseVector3, camera);
-        intersects = rayCaster3.intersectObjects(islandBiomes.mesh.children, true);
+        intersects3 = rayCaster3.intersectObjects(islandBiomes.mesh.children, true);
     
-        if (intersects.length !== 0) {
-          detailEvent(`rain`);
+        if (intersects3.length !== 0) {
+          detailEvent(`3`);
         } else {
           return;
         }
@@ -587,16 +650,31 @@
   };
 
   const detailEvent = state => {
-   //console.log(state);
+   
+   
+    // console.log(`sun: ` + intersects0);
+    // console.log(`rain: ` + intersects2);
     
 
     switch (state) {
-      case `rain`:
-      console.log(`rainLogic`);
+      case `0` :
+      console.log(`sunLogic0`);
+    
+      break;
+
+      case `1` :
+      console.log(`sunLogic1`);
+    
+      break;
+
+      case `2`:
+      //console.log(intersects2);
       
-        for (let i = 0; i < intersects.length; i++) {
-          if (intersects[i].object.name === `biome`) {
-            let currentBiome = intersects[i].object.parent.name;
+        for (let i = 0; i < intersects2.length; i++) {
+          if (intersects2[i].object.name === `biome`) {
+            let currentBiome = intersects2[i].object.parent.name;
+            //console.log(currentBiome);
+                        
     
             if (currentBiome != lastBiome) {
               for (let i = 0; i < rainItems.length; i++) {
@@ -605,8 +683,8 @@
                 }
               }
     
-              if (!rainItems.includes(intersects[i].object.parent.name)) {
-                rainItems.push(intersects[i].object.parent.name);
+              if (!rainItems.includes(intersects2[i].object.parent.name)) {
+                rainItems.push(intersects2[i].object.parent.name);
               }
             }
     
@@ -619,10 +697,35 @@
           }
         }
           break;
-      case `sun` :
-        console.log(`sunLogic`);
+
+      case `3`:
       
-        break;
+        for (let i = 0; i < intersects3.length; i++) {
+          if (intersects3[i].object.name === `biome`) {
+            let currentBiome = intersects3[i].object.parent.name;
+                        
+    
+            if (currentBiome != lastBiome) {
+              for (let i = 0; i < rainItems.length; i++) {
+                if (rainItems[i] === lastBiome) {
+                  rainItems.splice(i, 1);
+                }
+              }
+    
+              if (!rainItems.includes(intersects3[i].object.parent.name)) {
+                rainItems.push(intersects3[i].object.parent.name);
+              }
+            }
+    
+            // const item = islandPieces.find(o => o[intersects[i].object.parent.name]);
+            // console.log(item[intersects[i].object.parent.name]);
+    
+            //updateBiome(intersects[i].object, item[intersects[i].object.parent.name])
+    
+            lastBiome = currentBiome;
+          }
+        }
+          break;
       default:
         break;
     }

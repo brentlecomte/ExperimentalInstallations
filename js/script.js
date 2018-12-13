@@ -267,8 +267,12 @@
       
 
       if (Tag.zone && Tag.zone[0]) {
-        console.log(Tag.zone[0].object);
-        makeItRain(Tag.zone[0].object);
+        //console.log(Tag[2]);
+        if (Tag[2] >= 2) {
+          makeSunshine(Tag.zone[0].object)
+        } else {
+          makeItRain(Tag.zone[0].object);
+        }
       }
 
       
@@ -550,26 +554,11 @@
   
   const makeItRain = (z) => {
     
+    // console.log(`rain`);
+    
     if (z.material.opacity < 1) {
       z.material.opacity += .008;      
     }
-    console.log(z.material.opacity);
-    
-    
-      
-    
-    // console.log(e);
-    
-
-
-    
-    // if (rainObjItem.rain >= 100) {
-    //   return;
-    // } else {
-    //   rainObjItem.rain += 0.4;
-
-    //   rainModel.material.opacity = rainObjItem.rain / 100;
-    // }
   };
 
   const dryAll = () => {
@@ -579,10 +568,12 @@
     // })
 
     islandBiomes.mesh.children.forEach(b => {
-
-      if (b.children[0].material.opacity >= 0) {
-        b.children[0].material.opacity -= .0006;
-        
+      
+      if(b.children[0] != null){;        
+        if (b.children[0].material.opacity >= 0) {
+    
+          b.children[0].material.opacity -= .0006;
+        }
       }
       
       
@@ -606,21 +597,46 @@
   //   }
   // }
 
-  const makeSunShine = (sunObjItem) => {
+  // const makeSunShine = (sunObjItem) => {
+  //   for (let i = 0; i < flowers.length; i++) {
+  //     const element = flowers[i];
+  //     if (element.mesh.userData.parentName === sunObjItem.name) {
+  //       if (sunObjItem.sun >= 25) {
+  //         return;
+  //       } else {
+  //         sunObjItem.sun += 0.03;
+          
+          
+  //         element.mesh.scale.set(sunObjItem.sun / 100, sunObjItem.sun / 100, sunObjItem.sun / 100);
+  //       }       
+  //     }
+      
+  //   }
+    
+  // }
+  const makeSunshine = e => {
+
+    // console.log(e.parent.name);
+    
     for (let i = 0; i < flowers.length; i++) {
-      const element = flowers[i];
-      if (element.mesh.userData.parentName === sunObjItem.name) {
-        if (sunObjItem.sun >= 25) {
-          return;
-        } else {
-          sunObjItem.sun += 0.03;
-          
-          
-          element.mesh.scale.set(sunObjItem.sun / 100, sunObjItem.sun / 100, sunObjItem.sun / 100);
-        }       
+      const flower = flowers[i];
+      if (flower.mesh.userData.parentName === e.parent.name) {
+        // console.log(flower.mesh);
+        let targetScale = flower.mesh.scale;
+
+        if (targetScale.x <= .16) {
+          targetScale.x += .002;          
+        }
+        
+        flower.mesh.scale.set(targetScale.x, targetScale.x, targetScale.x) 
+        
       }
+
+      
+      
       
     }
+    
     
   }
 

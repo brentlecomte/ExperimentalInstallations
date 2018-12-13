@@ -294,7 +294,17 @@
       }
       lastPosX = sunPion1.mesh.position.x;
       lastPosY = sunPion1.mesh.position.z;
-    }
+    };
+    if (sunPion2) {
+      if (
+        sunPion2.mesh.position.x != lastPosX ||
+        sunPion2.mesh.position.z != lastPosY
+      ) {
+        onSphereMove();
+      }
+      lastPosX = sunPion2.mesh.position.x;
+      lastPosY = sunPion2.mesh.position.z;
+    };
     if (rainPion1) {
       if (
         rainPion1.mesh.position.x != lastPosX ||
@@ -304,6 +314,16 @@
       }
       lastPosX = rainPion1.mesh.position.x;
       lastPosY = rainPion1.mesh.position.z;
+    }
+    if (rainPion2) {
+      if (
+        rainPion2.mesh.position.x != lastPosX ||
+        rainPion2.mesh.position.z != lastPosY
+      ) {
+        onSphereMove();
+      }
+      lastPosX = rainPion2.mesh.position.x;
+      lastPosY = rainPion2.mesh.position.z;
     }
   };
 
@@ -345,9 +365,9 @@
       currentTags.push(checkTag);
       //console.log(checkTag);
       
-      // currentTags.forEach(t => {
-      //   console.log(t);
-      // });
+      currentTags.forEach(t => {
+        console.log(t);
+      });
       switch (checkTag[2]) {
         case 0:
           fireOnField(checkTag);
@@ -376,10 +396,11 @@
     if (!checkTag[0]) {
       return;
     }
+
+    
     if (!aliveTags.includes(checkTag[1])) {
       currentTags.forEach(Tag => {
         if (Tag.includes(checkTag[1])) {
-          console.log(checkTag);
 
           deleteTagsFromArray(checkTag, currentTags);
 
@@ -402,7 +423,7 @@
       1,
       -HEIGHT / 2,
       HEIGHT / 2
-    );
+    );    
 
     if (tagToShow[2] === 0) {
       sunPion1 = pion;
@@ -566,10 +587,7 @@
     //console.log(currentTags);
     
 
-    currentTags.forEach(t => {
-
-      console.log(t[2]);
-      
+    currentTags.forEach(t => {      
 
       switch (t[2]) {
         case 0:        
@@ -585,8 +603,6 @@
           break;
 
         case 1:
-        console.log(`ene`);
-
         mouseVector1.x = -checkTag[3] * 4 + 2;
         mouseVector1.y = -checkTag[4] * 4 + 2;
         rayCaster1.setFromCamera(mouseVector1, camera);

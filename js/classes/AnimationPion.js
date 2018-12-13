@@ -2,10 +2,11 @@ const Colors = require("../objects/Colors.js");
 
 class AnimationPion {
   constructor() {
+
+
     const geom = new THREE.RingGeometry(88, 120, 100);
     const mat = new THREE.MeshPhongMaterial({
       color: Colors.blue,
-      // flatShading: true
     });
 
     geom.mergeVertices();

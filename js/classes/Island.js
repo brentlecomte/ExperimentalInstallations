@@ -12,11 +12,10 @@ class Island {
     const loader = new THREE.JSONLoader();
     loader.load(`./assets/objects/island.json`, geometry => {
       geometry.computeVertexNormals();
-      
+
       const object = new THREE.Mesh(geometry, material);
       var bbox = new THREE.Box3().setFromObject(object);
-      console.log((bbox.max.x - bbox.min.x)*5);
-      console.log((bbox.max.z - bbox.min.z)*5);
+
       this.mesh.add(object);
     });
   }

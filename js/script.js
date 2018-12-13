@@ -49,7 +49,8 @@
     calpoint1,
     calpoint2,
     sphere1,
-    sphere2;
+    sphere2,
+    lastBiome;
   let calibrated = false;
 
   let checkTag = [];
@@ -114,12 +115,12 @@
     mouseVector2 = new THREE.Vector3();
     mouseVector3 = new THREE.Vector3();
     threeInit();
+    calibration();
   };
 
   const createScene = () => {
     WIDTH = window.innerWidth;
     HEIGHT = window.innerHeight;
-    console.log(WIDTH, HEIGHT);
 
     scene = new THREE.Scene();
 
@@ -257,15 +258,18 @@
           calpoint2 = Tag[3];
         }
       });
+      calibrateTags = [];
+      idTags = [];
 
-      calibrated = true;
       scene.remove(sphere1);
       scene.remove(sphere2);
+      setTimeout(() => {
+        calibrated = true;
+        console.log("nu");
+      }, 3000);
     }
 
     currentTags.forEach(Tag => {
-      console.log(currentTags);
-
       if (Tag[3] && calibrated === true && Tag.length === 12) {
         Tag[Tag.length - 1].mesh.position.x = mapValue(
           Tag[3],
@@ -369,9 +373,8 @@
       }
       lastPosX = sunPion2.mesh.position.x;
       lastPosY = sunPion2.mesh.position.z;
-    };
+    }
     if (!rainPion1 == ``) {
-
       if (
         rainPion1.mesh.position.x != lastPosX ||
         rainPion1.mesh.position.z != lastPosY
@@ -399,33 +402,34 @@
     if (calibrated === false && !idTags.includes(checkTag[2])) {
       idTags.push(checkTag[2]);
       calibrateTags.push(checkTag);
-    } else {
-      if (!idTags.includes(checkTag[2])) {
-        idTags.push(checkTag[2]);
-        currentTags.push(checkTag);
+    }
+    if (calibrated === true && !idTags.includes(checkTag[2])) {
+      console.log(checkTag);
 
-        switch (checkTag[2]) {
-          case 0:
-            fireOnField(checkTag);
-            break;
-          case 1:
-            fireOnField(checkTag);
-            break;
-          case 2:
-            waterOnField(checkTag);
-            break;
-          case 3:
-            waterOnField(checkTag);
-            break;
-        }
-      } else {
-        currentTags.forEach(Tag => {
-          if (Tag[2] === checkTag[2]) {
-            Tag[3] = checkTag[3];
-            Tag[4] = checkTag[4];
-          }
-        });
+      idTags.push(checkTag[2]);
+      currentTags.push(checkTag);
+
+      switch (checkTag[2]) {
+        case 0:
+          fireOnField(checkTag);
+          break;
+        case 1:
+          fireOnField(checkTag);
+          break;
+        case 2:
+          waterOnField(checkTag);
+          break;
+        case 3:
+          waterOnField(checkTag);
+          break;
       }
+    } else {
+      currentTags.forEach(Tag => {
+        if (Tag[2] === checkTag[2]) {
+          Tag[3] = checkTag[3];
+          Tag[4] = checkTag[4];
+        }
+      });
     }
   };
 
@@ -530,36 +534,29 @@
         break;
 
       case 1:
-
-      if (intersects1) {
-        for (let i = 0; i < sunItems.length; i++) {
-          if (sunItems[i] === intersects1[0].object.parent.name) {
-
-            sunItems.splice(i, 1);
+        if (intersects1) {
+          for (let i = 0; i < sunItems.length; i++) {
+            if (sunItems[i] === intersects1[0].object.parent.name) {
+              sunItems.splice(i, 1);
+            }
           }
         }
-      }
-      
-      
-      intersects1 = [];        
-      
+
+        intersects1 = [];
+
         break;
-    
+
       case 2:
-      
-      if (intersects2[0]) {
-
-        for (let i = 0; i < rainItems.length; i++) {
-          if (rainItems[i] === intersects2[0].object.parent.name) {
-            rainItems.splice(i, 1);
+        if (intersects2[0]) {
+          for (let i = 0; i < rainItems.length; i++) {
+            if (rainItems[i] === intersects2[0].object.parent.name) {
+              rainItems.splice(i, 1);
+            }
           }
+        }
 
-        }        
-      }
+        intersects2 = [];
 
-        
-        intersects2 = [];        
-        
         break;
 
       case 3:
@@ -642,12 +639,14 @@
         if (sunObjItem.sun >= 25) {
           return;
         } else {
-
           sunObjItem.sun += 0.03;
-          
-          
-          element.mesh.scale.set(sunObjItem.sun / 100, sunObjItem.sun / 100, sunObjItem.sun / 100);
-        }       
+
+          element.mesh.scale.set(
+            sunObjItem.sun / 100,
+            sunObjItem.sun / 100,
+            sunObjItem.sun / 100
+          );
+        }
       }
     }
   };
@@ -657,17 +656,13 @@
       const piece = islandPieces[0][p];
 
       if (piece.sun > 0) {
-
         piece.sun -= 0.01;
-        
       }
 
       flowers.forEach(f => {
         if (f.mesh.userData.parentName === piece.name) {
-
           let targetScale = Math.max(0.001, piece.sun / 100);
-          f.mesh.scale.set(targetScale, targetScale, targetScale)
-          
+          f.mesh.scale.set(targetScale, targetScale, targetScale);
         }
       });
     }
@@ -748,56 +743,46 @@
     });
   };
 
-  const detailEvent = state => {   
+  const detailEvent = state => {
     switch (state) {
-      case `0` :
-      for (let i = 0; i < intersects0.length; i++) {
-        if (intersects0[i].object.name === `biome`) {
-          currentBiome0 = intersects0[i].object.parent.name;          
+      case `0`:
+        for (let i = 0; i < intersects0.length; i++) {
+          if (intersects0[i].object.name === `biome`) {
+            currentBiome0 = intersects0[i].object.parent.name;
 
-        if (currentBiome0 != lastBiome0) {
-          for (let i = 0; i < sunItems.length; i++) {
-            if (sunItems[i] === lastBiome0) {
-              sunItems.splice(i, 1);
+            if (currentBiome0 != lastBiome0) {
+              for (let i = 0; i < sunItems.length; i++) {
+                if (sunItems[i] === lastBiome0) {
+                  sunItems.splice(i, 1);
+                }
+
+                lastBiome0 = currentBiome0;
+              }
             }
+            break;
 
             lastBiome0 = currentBiome0;
           }
         }
         break;
 
+      case `1`:
+        for (let i = 0; i < intersects1.length; i++) {
+          if (intersects1[i].object.name === `biome`) {
+            let currentBiome1 = intersects1[i].object.parent.name;
+            // console.log(currentBiome1);
 
-        lastBiome0 = currentBiome0;
-
-        }
-        
-      }      
-      break;
-
-      case `1` :
-      for (let i = 0; i < intersects1.length; i++) {
-
-        if (intersects1[i].object.name === `biome`) {
-          let currentBiome1 = intersects1[i].object.parent.name;
-          // console.log(currentBiome1);
-
-
-
-              if (!sunItems.includes(intersects1[i].object.parent.name)) {
-                sunItems.push(intersects1[i].object.parent.name);
-              }
+            if (!sunItems.includes(intersects1[i].object.parent.name)) {
+              sunItems.push(intersects1[i].object.parent.name);
             }
-            lastBiome1 = currentBiome1;
           }
-
+          lastBiome1 = currentBiome1;
 
           if (!sunItems.includes(intersects1[i].object.parent.name)) {
             sunItems.push(intersects1[i].object.parent.name);
           }
-        }        
-        console.log(currentBiome1);
-        
-        lastBiome1 = currentBiome1;
+
+          lastBiome1 = currentBiome1;
         }
 
         break;

@@ -6,6 +6,7 @@
   const Flower = require("./classes/Flower.js");
   const Sea = require("./classes/Sea.js");
   const AnimationPion = require("./classes/AnimationPion.js");
+  const Boat = require("./classes/Boat.js");
 
   let container,
     renderer,
@@ -49,12 +50,16 @@
     calpoint1,
     calpoint2,
     sphere1,
-    sphere2;
+    sphere2,
+    boat;
+
   let calibrated = false;
   let showDemoBool = false;
 
   let $p = document.querySelector("p");
   let $h1 = document.querySelector("h1");
+  let $p2 = document.querySelector(".p2");
+  let $h2 = document.querySelector("h2");
 
   let checkTag = [];
   let idTags = [];
@@ -247,6 +252,14 @@
     flowers.push(flower);
   };
 
+  const createBoat = () => {
+    boat = new Boat();
+
+    scene.add(boat.mesh);
+
+    boat.mesh.position.y = -20;
+  };
+
   const loop = () => {
     requestAnimationFrame(loop);
     sea.moveWaves();
@@ -254,6 +267,7 @@
 
     if (calibrateTags.length === 1) {
       $p.textContent = "Zet een andere pion op de rechterbol";
+      $p2.textContent = "Zet een andere pion op de rechterbol";
     }
 
     if (!calpoint1 && calibrateTags.length === 2) {
@@ -268,25 +282,32 @@
       });
 
       $p.textContent = "Haal de pionnen van het eiland";
+      $p2.textContent = "Haal de pionnen van het eiland";
 
       scene.remove(sphere1);
       scene.remove(sphere2);
+      idTags = [];
       setTimeout(() => {
         $h1.textContent = "gekalibreerd";
         $p.textContent = "het spel kan gespeelt worden";
+        $h2.textContent = "gekalibreerd";
+        $p2.textContent = "het spel kan gespeelt worden";
         calibrated = true;
       }, 3000);
       setTimeout(() => {
         $h1.textContent = "";
         $p.textContent = "";
+        $h2.textContent = "";
+        $p2.textContent = "";
         showDemoBool = true;
       }, 5000);
     }
 
-    // if (showDemoBool === true) {
-    //   setTimeout(showDemo(), 5000);
-    //   showDemoBool = false;
-    // }
+    if (showDemoBool === true) {
+      showDemoZon();
+      showDemoRegen();
+      showDemoBool = false;
+    }
 
     currentTags.forEach(Tag => {
       console.log(currentTags);
@@ -344,18 +365,24 @@
     loop();
   };
 
-  // const showDemo = () => {
-  //   for (let i = 0; i < 100; i += 0.01) {
-  //     $h1.textContent = "Regendanser";
-  //     $p.textContent =
-  //       "Plaats de regendanser op het eiland en laat het groen worden!";
-  //     if (i > 50) {
-  //       $h1.textContent = "Zonnedanser";
-  //       $p.textContent =
-  //         "Wanneer het genoeg geregend heeft kan de zonnedanser bloemen laten groeien!";
-  //     }
-  //   }
-  // };
+  const showDemoZon = () => {
+    $h1.textContent = "Zonnedanser";
+    $p.textContent =
+      "Wanneer het genoeg geregend heeft kan de zonnedanser bloemen laten groeien!";
+    if (currentTags.length === 0) {
+      showDemoBool = true;
+    }
+  };
+
+  const showDemoRegen = () => {
+    $h2.textContent = "Regendanser";
+    $p2.textContent =
+      "Plaats de regendanser op het eiland en laat het groen worden!";
+
+    if (currentTags.length === 0) {
+      showDemoBool = true;
+    }
+  };
 
   const calibration = () => {
     const geometry1 = new THREE.SphereGeometry(5, 32, 32);

@@ -215,7 +215,7 @@
 
   const createFlower = (x, z, name, parent) => {
     flower = new Flower(name, parent);
-    flower.mesh.scale.set(0);
+    flower.mesh.scale.set(0.001, 0.001, 0.001);
     flower.mesh.position.y = 40;
     flower.mesh.position.x = x;
     flower.mesh.position.z = z;
@@ -316,7 +316,7 @@
       lastPosX = sunPion2.mesh.position.x;
       lastPosY = sunPion2.mesh.position.z;
     };
-    if (rainPion1) {
+    if (!rainPion1 == ``) {
       if (
         rainPion1.mesh.position.x != lastPosX ||
         rainPion1.mesh.position.z != lastPosY
@@ -473,23 +473,31 @@
       break;
     
       case 1:
-      for (let i = 0; i < sunItems.length; i++) {
-        if (sunItems[i] === intersects1[0].object.parent.name) {
-          sunItems.splice(i, 1);
+
+      if (intersects1) {
+        for (let i = 0; i < sunItems.length; i++) {
+          if (sunItems[i] === intersects1[0].object.parent.name) {
+
+            sunItems.splice(i, 1);
+          }
         }
       }
+      
       
       intersects1 = [];        
       
         break;
     
       case 2:
-
+      
+      if (intersects2[0]) {
         for (let i = 0; i < rainItems.length; i++) {
           if (rainItems[i] === intersects2[0].object.parent.name) {
             rainItems.splice(i, 1);
           }
-        }
+        }        
+      }
+
         
         intersects2 = [];        
         
@@ -601,7 +609,8 @@
 
       flowers.forEach(f => {
         if (f.mesh.userData.parentName === piece.name) {
-          f.mesh.scale.set(piece.sun / 100, piece.sun / 100, piece.sun / 100)
+          let targetScale = Math.max(0.001, piece.sun / 100);
+          f.mesh.scale.set(targetScale, targetScale, targetScale)
           
         }
       });
@@ -712,7 +721,7 @@
 
         if (intersects1[i].object.name === `biome`) {
           let currentBiome1 = intersects1[i].object.parent.name;
-          console.log(currentBiome1);
+          // console.log(currentBiome1);
 
 
         if (currentBiome1 != lastBiome1) {
@@ -726,6 +735,8 @@
             sunItems.push(intersects1[i].object.parent.name);
           }
         }        
+        console.log(currentBiome1);
+        
         lastBiome1 = currentBiome1;
 
 

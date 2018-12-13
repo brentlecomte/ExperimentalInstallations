@@ -8,7 +8,7 @@ class IslandBiome {
         this.mesh.name = piece;
         const material = new THREE.MeshPhongMaterial({
           color: 0x14a311,
-          flatShading: true,
+          // flatShading: true,
           transparent: true,
           opacity: 0,
           name: piece

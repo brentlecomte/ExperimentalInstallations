@@ -5,7 +5,7 @@ class Island {
     this.mesh = new THREE.Object3D();
     const material = new THREE.MeshPhongMaterial({
       color: 0xeaaa3c,
-      flatShading: true,
+      // flatShading: true,
       side: THREE.DoubleSide
     });
 

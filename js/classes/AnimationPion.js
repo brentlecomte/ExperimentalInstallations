@@ -2,7 +2,9 @@ const Colors = require("../objects/Colors.js");
 
 class AnimationPion {
   constructor() {
-    const geom = new THREE.CylinderGeometry(20, 20, 10, 10);
+
+
+    const geom = new THREE.RingGeometry(88, 120, 100);
     const mat = new THREE.MeshPhongMaterial({
       color: Colors.blue,
     });
@@ -23,6 +25,9 @@ class AnimationPion {
     });
 
     this.mesh = new THREE.Mesh(geom, mat);
+
+    this.mesh.position.y = 0;
+    this.mesh.rotation.x = Math.PI / 2;
     this.mesh.receiveShadows = true;
     this.mesh.name = "animation";
   }

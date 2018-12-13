@@ -2,10 +2,9 @@ const Colors = require("../objects/Colors.js");
 
 class AnimationPion {
   constructor() {
-    const geom = new THREE.CylinderGeometry(20, 20, 0.1, 10);
+    const geom = new THREE.CylinderGeometry(20, 20, 10, 10);
     const mat = new THREE.MeshPhongMaterial({
       color: Colors.blue,
-      // flatShading: true
     });
 
     geom.mergeVertices();

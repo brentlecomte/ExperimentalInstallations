@@ -197,7 +197,7 @@
 
   const createIsland = () => {
     island = new Island();
-    island.mesh.scale.set(5, 1, 5);
+     island.mesh.scale.set(5, 1, 5);
 
     scene.add(island.mesh);
 
@@ -215,8 +215,7 @@
 
   const createFlower = (x, z, name, parent) => {
     flower = new Flower(name, parent);
-    // flower.mesh.scale.set(.08, .08, .08);
-    flower.mesh.scale.set(0);
+    flower.mesh.scale.set(0.001, 0.001, 0.001);
     flower.mesh.position.y = 40;
     flower.mesh.position.x = x;
     flower.mesh.position.z = z;
@@ -263,18 +262,18 @@
     createLights();
     createIsland();
     createSea();
-    createFlower(-120, -80, `topLeft1`, `topLeft`);
-    createFlower(-180, -40, `topLeft2`, `topLeft`);
-    createFlower(-170, 40, `botLeft1`, `botLeft`);
-    createFlower(-110, 50, `botLeft2`, `botLeft`);
-    createFlower(-20, 40, `botMid1`, `botMid`);
-    createFlower(40, 80, `botMid2`, `botMid`);
-    createFlower(-40, -30, `topMid1`, `topMid`);
-    createFlower(30, -65, `topMid2`, `toMid`);
-    createFlower(180, -30, `topRight1`, `topRight`);
-    createFlower(130, -65, `topRight2`, `topRight`);
-    createFlower(180, 30, `botRight1`, `botRight`);
-    createFlower(110, 50, `botRight2`, `botRight`);
+    createFlower(-320, -250, `topLeft1`, `topLeft`);
+    createFlower(-400, -140, `topLeft2`, `topLeft`);
+    createFlower(-425, 100, `botLeft1`, `botLeft`);
+    createFlower(-280, 125, `botLeft2`, `botLeft`);
+    createFlower(-50, 100, `botMid1`, `botMid`);
+    createFlower(100, 200, `botMid2`, `botMid`);
+    createFlower(-100, -75, `topMid1`, `topMid`);
+    createFlower(75, -165, `topMid2`, `topMid`);
+    createFlower(450, -75, `topRight1`, `topRight`);
+    createFlower(325, -165, `topRight2`, `topRight`);
+    createFlower(450, 75, `botRight1`, `botRight`);
+    createFlower(275, 125, `botRight2`, `botRight`);
     //console.log(flowers);
 
     loop();
@@ -317,7 +316,7 @@
       lastPosX = sunPion2.mesh.position.x;
       lastPosY = sunPion2.mesh.position.z;
     };
-    if (rainPion1) {
+    if (!rainPion1 == ``) {
       if (
         rainPion1.mesh.position.x != lastPosX ||
         rainPion1.mesh.position.z != lastPosY
@@ -474,23 +473,31 @@
       break;
     
       case 1:
-      for (let i = 0; i < sunItems.length; i++) {
-        if (sunItems[i] === intersects1[0].object.parent.name) {
-          sunItems.splice(i, 1);
+
+      if (intersects1) {
+        for (let i = 0; i < sunItems.length; i++) {
+          if (sunItems[i] === intersects1[0].object.parent.name) {
+
+            sunItems.splice(i, 1);
+          }
         }
       }
+      
       
       intersects1 = [];        
       
         break;
     
       case 2:
-
+      
+      if (intersects2[0]) {
         for (let i = 0; i < rainItems.length; i++) {
           if (rainItems[i] === intersects2[0].object.parent.name) {
             rainItems.splice(i, 1);
           }
-        }
+        }        
+      }
+
         
         intersects2 = [];        
         
@@ -576,13 +583,13 @@
     for (let i = 0; i < flowers.length; i++) {
       const element = flowers[i];
       if (element.mesh.userData.parentName === sunObjItem.name) {
-        if (sunObjItem.sun >= 70) {
+        if (sunObjItem.sun >= 25) {
           return;
         } else {
-          sunObjItem.sun += 0.1;
+          sunObjItem.sun += 0.03;
           
           
-          element.mesh.scale.set(sunObjItem.sun / 1000, sunObjItem.sun / 1000, sunObjItem.sun / 1000);
+          element.mesh.scale.set(sunObjItem.sun / 100, sunObjItem.sun / 100, sunObjItem.sun / 100);
         }       
       }
       
@@ -596,13 +603,14 @@
       
 
       if (piece.sun > 0) {
-        piece.sun -= 0.05;
+        piece.sun -= 0.01;
         
       }
 
       flowers.forEach(f => {
         if (f.mesh.userData.parentName === piece.name) {
-          f.mesh.scale.set(piece.sun / 1000, piece.sun / 1000, piece.sun / 1000)
+          let targetScale = Math.max(0.001, piece.sun / 100);
+          f.mesh.scale.set(targetScale, targetScale, targetScale)
           
         }
       });
@@ -680,14 +688,14 @@
 
   const detailEvent = state => {
 
- 
+    
     
    
     switch (state) {
       case `0` :
       for (let i = 0; i < intersects0.length; i++) {
         if (intersects0[i].object.name === `biome`) {
-          currentBiome0 = intersects0[i].object.parent.name;
+          currentBiome0 = intersects0[i].object.parent.name;          
 
         if (currentBiome0 != lastBiome0) {
           for (let i = 0; i < sunItems.length; i++) {
@@ -703,7 +711,6 @@
 
         lastBiome0 = currentBiome0;
 
-
         }
         
       }      
@@ -714,6 +721,8 @@
 
         if (intersects1[i].object.name === `biome`) {
           let currentBiome1 = intersects1[i].object.parent.name;
+          // console.log(currentBiome1);
+
 
         if (currentBiome1 != lastBiome1) {
           for (let i = 0; i < sunItems.length; i++) {
@@ -726,6 +735,8 @@
             sunItems.push(intersects1[i].object.parent.name);
           }
         }        
+        console.log(currentBiome1);
+        
         lastBiome1 = currentBiome1;
 
 

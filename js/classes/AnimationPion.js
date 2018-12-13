@@ -5,7 +5,7 @@ class AnimationPion {
     const geom = new THREE.CylinderGeometry(20, 20, 0.1, 10);
     const mat = new THREE.MeshPhongMaterial({
       color: Colors.blue,
-      flatShading: true
+      // flatShading: true
     });
 
     geom.mergeVertices();

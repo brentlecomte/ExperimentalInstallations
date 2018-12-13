@@ -23,7 +23,7 @@ class Sea {
           color:Colors.blue,
           transparent:true,
           opacity:.6,
-          flatShading: true
+        //   flatShading: true
         });
     
     
